@@ -35,6 +35,69 @@ var createAnimatableComponent = function(component) {
       });
     },
 
+    flash: function(duration, times) {
+      var inputRange = [0];
+      var outputRange = [1];
+      times = Math.abs(times || 2) * 2;
+      for(var i = 1; i <= times; i++) {
+        inputRange.push(i/times);
+        outputRange.push(i % 2 ? 0 : 1);
+      }
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange, outputRange
+        }),
+      });
+    },
+
+    jello: function(duration, skew, times) {
+      var inputRange = [0];
+      var outputRange = ['0 deg'];
+      skew = skew || 12.5;
+      times = Math.abs(times || 4) * 2;
+      for(var i = 1; i < times; i++) {
+        inputRange.push(i/times);
+        outputRange.push(skew / i * (i % 2 ? -1 : 1) + ' deg');
+      }
+      inputRange.push(1);
+      outputRange.push('0 deg');
+
+      this.animate(duration, {
+        transform: [{
+          skewX: this.state.animationValue.interpolate({ inputRange, outputRange })
+        }, {
+          skewY: this.state.animationValue.interpolate({ inputRange, outputRange })
+        }]
+      });
+    },
+
+    pulse: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          scale: this.state.animationValue.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [1, 1.05, 1],
+          }),
+        }],
+      });
+    },
+
+    rubberBand: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          scaleX: this.state.animationValue.interpolate({
+            inputRange: [0, 0.3, 0.4, 0.5, 0.65, 0.75, 1],
+            outputRange: [1, 1.25, 0.75, 1.15, 0.95, 1.05, 1],
+          }),
+        }, {
+          scaleY: this.state.animationValue.interpolate({
+            inputRange: [0, 0.3, 0.4, 0.5, 0.65, 0.75, 1],
+            outputRange: [1, 0.75, 1.25, 0.85, 1.05, 0.95, 1],
+          }),
+        }],
+      });
+    },
+
     shake: function(duration, distance, times) {
       var inputRange = [0];
       var outputRange = [0];
@@ -48,6 +111,50 @@ var createAnimatableComponent = function(component) {
         transform: [{
           translateX: this.state.animationValue.interpolate({
             inputRange, outputRange
+          }),
+        }],
+      });
+    },
+
+    swing: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          rotateZ: this.state.animationValue.interpolate({
+            inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
+            outputRange: ['0 deg', '15 deg', '-10 deg', '5 deg', '-5 deg', '0 deg'],
+          }),
+        }],
+      });
+    },
+
+    tada: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          scale: this.state.animationValue.interpolate({
+            inputRange: [0, 0.1, 0.2, 0.3, 0.9, 1],
+            outputRange: [1, 0.9, 0.9, 1.1, 1.1, 1],
+          }),
+        }, {
+          rotateZ: this.state.animationValue.interpolate({
+            inputRange: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            outputRange: ['0 deg', '-3 deg', '-3 deg', '3 deg', '-3 deg', '3 deg', '-3 deg', '3 deg', '-3 deg', '3 deg', '0 deg'],
+          }),
+        }],
+      });
+    },
+
+    wobble: function(duration) {
+      var width = this._layout.width;
+      this.animate(duration, {
+        transform: [{
+          translateX: this.state.animationValue.interpolate({
+            inputRange: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1],
+            outputRange: [0, -0.25*width, 0.2*width, -0.15*width, 0.1*width, -0.05*width, 1],
+          }),
+        }, {
+          rotateZ: this.state.animationValue.interpolate({
+            inputRange: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1],
+            outputRange: ['0 deg', '-5 deg', '3 deg', '-3 deg', '2 deg', '-1 deg', '0 deg'],
           }),
         }],
       });
@@ -116,10 +223,10 @@ var createAnimatableComponent = function(component) {
     _slide: function(duration, direction, originOrDestination) {
       var animationValue;
       switch(originOrDestination) {
-        case 'up':    animationValue = this.layout.height; break;
-        case 'down':  animationValue = -this.layout.height; break;
-        case 'left':  animationValue = -this.layout.width; break;
-        case 'right': animationValue = this.layout.width; break;
+        case 'up':    animationValue = this._layout.height; break;
+        case 'down':  animationValue = -this._layout.height; break;
+        case 'left':  animationValue = -this._layout.width; break;
+        case 'right': animationValue = this._layout.width; break;
       }
 
       var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
@@ -174,7 +281,7 @@ var createAnimatableComponent = function(component) {
       var { style, children, onLayout, ...props } = this.props;
       return (<Animatable
         onLayout={event => {
-          this.layout = event.nativeEvent.layout;
+          this._layout = event.nativeEvent.layout;
           if(onLayout) {
             onLayout(event);
           }

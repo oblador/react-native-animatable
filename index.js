@@ -220,7 +220,60 @@ var createAnimatableComponent = function(component) {
       });
     },
 
-    _slide: function(duration, direction, originOrDestination) {
+    _fade: function(duration, direction, originOrDestination) {
+      var style = {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: (direction === 'in' ? [0, 1] : [1, 0]),
+        }),
+      };
+      if(originOrDestination) {
+        style.transform = [this._getSlideTransformation(direction, originOrDestination)];
+      }
+      this.animate(duration, style);
+    },
+
+    fadeIn: function(duration) {
+      this._fade(duration, 'in');
+    },
+
+    fadeInDown: function(duration) {
+      this._fade(duration, 'in', 'down');
+    },
+
+    fadeInUp: function(duration) {
+      this._fade(duration, 'in', 'up');
+    },
+
+    fadeInLeft: function(duration) {
+      this._fade(duration, 'in', 'left');
+    },
+
+    fadeInRight: function(duration) {
+      this._fade(duration, 'in', 'right');
+    },
+
+    fadeOut: function(duration) {
+      this._fade(duration, 'out');
+    },
+
+    fadeOutDown: function(duration) {
+      this._fade(duration, 'out', 'down');
+    },
+
+    fadeOutUp: function(duration) {
+      this._fade(duration, 'out', 'up');
+    },
+
+    fadeOutLeft: function(duration) {
+      this._fade(duration, 'out', 'left');
+    },
+
+    fadeOutRight: function(duration) {
+      this._fade(duration, 'out', 'right');
+    },
+
+    _getSlideTransformation: function(direction, originOrDestination) {
       var animationValue;
       switch(originOrDestination) {
         case 'up':    animationValue = this._layout.height; break;
@@ -239,9 +292,12 @@ var createAnimatableComponent = function(component) {
         inputRange: [0, 1],
         outputRange: (direction === 'in' ? [animationValue, 0] : [0, animationValue]),
       });
+      return transformation;
+    },
 
+    _slide: function(duration, direction, originOrDestination) {
       this.animate(duration, {
-        transform: [transformation],
+        transform: [this._getSlideTransformation(direction, originOrDestination)],
       });
     },
 

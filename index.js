@@ -113,9 +113,61 @@ var createAnimatableComponent = function(component) {
       });
     },
 
+    slideInDown: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          translateY: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [-this.layout.height, 0],
+          }),
+        }],
+      });
+    },
+
+    slideInUp: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          translateY: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [this.layout.height, 0],
+          }),
+        }],
+      });
+    },
+
+    slideInLeft: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          translateX: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [-this.layout.width, 0],
+          }),
+        }],
+      });
+    },
+
+    slideInRight: function(duration) {
+      this.animate(duration, {
+        transform: [{
+          translateX: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [this.layout.width, 0],
+          }),
+        }],
+      });
+    },
+
     render: function() {
-      var { style, children, ...props } = this.props;
-      return (<Animatable style={[this.state.animationStyle, style]} {...props}>{children}</Animatable>);
+      var { style, children, onLayout, ...props } = this.props;
+      return (<Animatable
+        onLayout={event => {
+          this.layout = event.nativeEvent.layout;
+          if(onLayout) {
+            onLayout(event);
+          }
+        }}
+        style={[this.state.animationStyle, style]}
+        {...props}>{children}</Animatable>);
     }
   });
 };

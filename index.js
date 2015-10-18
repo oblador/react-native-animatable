@@ -113,48 +113,61 @@ var createAnimatableComponent = function(component) {
       });
     },
 
-    slideInDown: function(duration) {
-      this.animate(duration, {
-        transform: [{
-          translateY: this.state.animationValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [-this.layout.height, 0],
-          }),
-        }],
+    _slide: function(duration, direction, originOrDestination) {
+      var animationValue;
+      switch(originOrDestination) {
+        case 'up':    animationValue = this.layout.height; break;
+        case 'down':  animationValue = -this.layout.height; break;
+        case 'left':  animationValue = -this.layout.width; break;
+        case 'right': animationValue = this.layout.width; break;
+      }
+
+      var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+      if(translateKey === 'translateY' && direction === 'out') {
+        animationValue = -animationValue;
+      }
+
+      var transformation = {};
+      transformation[translateKey] = this.state.animationValue.interpolate({
+        inputRange: [0, 1],
+        outputRange: (direction === 'in' ? [animationValue, 0] : [0, animationValue]),
       });
+
+      this.animate(duration, {
+        transform: [transformation],
+      });
+    },
+
+    slideInDown: function(duration) {
+      this._slide(duration, 'in', 'down');
     },
 
     slideInUp: function(duration) {
-      this.animate(duration, {
-        transform: [{
-          translateY: this.state.animationValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [this.layout.height, 0],
-          }),
-        }],
-      });
+      this._slide(duration, 'in', 'up');
     },
 
     slideInLeft: function(duration) {
-      this.animate(duration, {
-        transform: [{
-          translateX: this.state.animationValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [-this.layout.width, 0],
-          }),
-        }],
-      });
+      this._slide(duration, 'in', 'left');
     },
 
     slideInRight: function(duration) {
-      this.animate(duration, {
-        transform: [{
-          translateX: this.state.animationValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [this.layout.width, 0],
-          }),
-        }],
-      });
+      this._slide(duration, 'in', 'right');
+    },
+
+    slideOutDown: function(duration) {
+      this._slide(duration, 'out', 'down');
+    },
+
+    slideOutUp: function(duration) {
+      this._slide(duration, 'out', 'up');
+    },
+
+    slideOutLeft: function(duration) {
+      this._slide(duration, 'out', 'left');
+    },
+
+    slideOutRight: function(duration) {
+      this._slide(duration, 'out', 'right');
     },
 
     render: function() {

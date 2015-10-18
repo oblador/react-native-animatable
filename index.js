@@ -53,6 +53,66 @@ var createAnimatableComponent = function(component) {
       });
     },
 
+    flipInX: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.6, 1],
+          outputRange: [0, 1, 1],
+        }),
+        transform: [{
+          rotateX: this.state.animationValue.interpolate({
+            inputRange: [0, 0.4, 0.6, 0.8, 1],
+            outputRange: ['90 deg', '-20 deg', '10 deg', '-5 deg', '0 deg'],
+          }),
+        }],
+      });
+    },
+
+    flipInY: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.6, 1],
+          outputRange: [0, 1, 1],
+        }),
+        transform: [{
+          rotateY: this.state.animationValue.interpolate({
+            inputRange: [0, 0.4, 0.6, 0.8, 1],
+            outputRange: ['90 deg', '-20 deg', '10 deg', '-5 deg', '0 deg'],
+          }),
+        }],
+      });
+    },
+
+    flipOutX: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.3, 1],
+          outputRange: [1, 1, 0],
+        }),
+        transform: [{
+          rotateX: this.state.animationValue.interpolate({
+            inputRange: [0, 0.3, 1],
+            outputRange: ['0 deg', '-20 deg', '90 deg'],
+          }),
+        }],
+      });
+    },
+
+    flipOutY: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.3, 1],
+          outputRange: [1, 1, 0],
+        }),
+        transform: [{
+          rotateY: this.state.animationValue.interpolate({
+            inputRange: [0, 0.3, 1],
+            outputRange: ['0 deg', '-20 deg', '90 deg'],
+          }),
+        }],
+      });
+    },
+
     render: function() {
       var { style, children, ...props } = this.props;
       return (<Animatable style={[this.state.animationStyle, style]} {...props}>{children}</Animatable>);

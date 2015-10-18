@@ -19,7 +19,7 @@ var createAnimatableComponent = function(component) {
       this.setState({ animationStyle }, function() {
         Animated.timing(animationValue, {
           toValue: 1,
-          duration
+          duration: duration || 1000
         }).start();
       });
     },
@@ -84,7 +84,7 @@ var createAnimatableComponent = function(component) {
     },
 
     flipOutX: function(duration) {
-      this.animate(duration, {
+      this.animate(duration || 750, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.3, 1],
           outputRange: [1, 1, 0],
@@ -99,7 +99,7 @@ var createAnimatableComponent = function(component) {
     },
 
     flipOutY: function(duration) {
-      this.animate(duration, {
+      this.animate(duration || 750, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.3, 1],
           outputRange: [1, 1, 0],

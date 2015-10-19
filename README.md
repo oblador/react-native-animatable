@@ -1,14 +1,23 @@
 # react-native-animatable
 Standard set of easy to use animations for React Native
 
-## Declarative Usage
+## Usage
+
+To animate things you must use the `createAnimatableComponent` composer similar to the `Animated.createAnimatedComponent`. The common components `View`, `Text` and `Image` are precomposed and exposed under the `Animatable` namespace. If you have your own component that you wish to animate, simply wrap it with a `Animatable.View` or compose it with:
 
 ```js
 var Animatable = require('react-native-animatable');
-var myFadingText = (<Animatable.Text animation="fadeIn">Fade me in plz</Animatable.Text>);
+MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 ```
 
-### Properties
+### Declarative Usage
+
+```js
+var Animatable = require('react-native-animatable');
+var myFadingText = (<Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>);
+```
+
+#### Properties
 *Note: Other properties will be passed down to underlying component.*
 
 | Prop | Description | Default |
@@ -17,12 +26,13 @@ var myFadingText = (<Animatable.Text animation="fadeIn">Fade me in plz</Animatab
 |**`duration`**|For how long the animation will run (milliseconds). |`1000`|
 |**`delay`**|Optionally delay animation (milliseconds). |`0`|
 
-## Imperative Usage
+### Imperative Usage
 
 All animations are exposed as functions on Animatable elements, they take an optional `duration` argument.
 
-```
+```js
 var Animatable = require('react-native-animatable');
+
 React.createClass({
   render: function() {
     return (

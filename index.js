@@ -52,6 +52,10 @@ var createAnimatableComponent = function(component) {
       };
     },
 
+    setNativeProps: function(nativeProps) {
+      this._root.setNativeProps(nativeProps);
+    },
+
     componentWillMount: function() {
       var { animation, duration } = this.props;
       if(animation) {
@@ -649,6 +653,7 @@ var createAnimatableComponent = function(component) {
         }}
         style={[this.state.animationStyle, style]}
         {...props}>{children}</Animatable>);
+        ref={(component) => this._root = component}
     }
   });
 };

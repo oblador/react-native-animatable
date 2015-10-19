@@ -3,6 +3,16 @@
 var React = require('react-native');
 var { View, Text, Image, Animated } = React;
 
+// Transform an object to an array the way react native wants it for transform styles
+// { a: x, b: y } => [{ a: x }, { b: y }]
+var createKeyedArray = function(obj) {
+  return Object.keys(obj).map(function(key) {
+    var keyed = {};
+    keyed[key] = obj[key];
+    return keyed;
+  });
+};
+
 // Helper function to calculate transform values, args:
 // direction: in|out
 // originOrDestination: up|down|left|right
@@ -279,7 +289,7 @@ var createAnimatableComponent = function(component) {
         }),
       };
       if(originOrDestination) {
-        style.transform = [this._getSlideTransformation(direction, originOrDestination)];
+        style.transform = createKeyedArray(this._getSlideTransformation(direction, originOrDestination, isBig));
       }
       this.animate(duration, style);
     },
@@ -371,7 +381,7 @@ var createAnimatableComponent = function(component) {
 
     _slide: function(duration, direction, originOrDestination) {
       this.animate(duration, {
-        transform: [this._getSlideTransformation(direction, originOrDestination)],
+        transform: createKeyedArray(this._getSlideTransformation(direction, originOrDestination)),
       });
     },
 
@@ -405,6 +415,100 @@ var createAnimatableComponent = function(component) {
 
     slideOutRight: function(duration) {
       this._slide(duration, 'out', 'right');
+    },
+
+    _zoom: function(duration, direction, originOrDestination) {
+      var style = {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
+          outputRange: (direction === 'in' ? [0, 1, 1] : [1, 1, 0]),
+        }),
+      };
+      if(originOrDestination) {
+        style.transform = createKeyedArray(this._getZoomTransformation(direction, originOrDestination));
+      }
+      this.animate(duration, style);
+    },
+
+    _getZoomTransformation: function(direction, originOrDestination) {
+      var windowSize = Dimensions.get('window');
+      var animationValue = getAnimationValueForDirection(direction, originOrDestination, windowSize.height, windowSize.width);
+      var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+      var modifier = animationValue > 0 ? 1 : -1;
+
+      var transformation = {
+        scale: this.state.animationValue.interpolate({
+          inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
+          outputRange: (direction === 'in' ? [0.1, 0.457, 1] : [1, 0.457, 0.1])
+        }),
+      };
+      transformation[translateKey] = this.state.animationValue.interpolate({
+        inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
+        outputRange: (direction === 'in' ? [animationValue, -60 * modifier, 0] : [0, -60 * modifier, animationValue])
+      });
+      return transformation;
+    },
+
+    zoomIn: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.5, 1],
+          outputRange: [0, 1, 1],
+        }),
+        transform: [{
+          scale: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.3, 1],
+          }),
+        }],
+      });
+    },
+
+    zoomOut: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.5, 1],
+          outputRange: [1, 1, 0],
+        }),
+        transform: [{
+          scale: this.state.animationValue.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [1, 0.3, 0],
+          }),
+        }],
+      });
+    },
+
+    zoomInDown: function(duration) {
+      this._zoom(duration, 'in', 'down');
+    },
+
+    zoomInUp: function(duration) {
+      this._zoom(duration, 'in', 'up');
+    },
+
+    zoomInLeft: function(duration) {
+      this._zoom(duration, 'in', 'left');
+    },
+
+    zoomInRight: function(duration) {
+      this._zoom(duration, 'in', 'right');
+    },
+
+    zoomOutDown: function(duration) {
+      this._zoom(duration, 'out', 'down');
+    },
+
+    zoomOutUp: function(duration) {
+      this._zoom(duration, 'out', 'up');
+    },
+
+    zoomOutLeft: function(duration) {
+      this._zoom(duration, 'out', 'left');
+    },
+
+    zoomOutRight: function(duration) {
+      this._zoom(duration, 'out', 'right');
     },
 
     render: function() {

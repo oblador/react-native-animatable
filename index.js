@@ -231,6 +231,46 @@ var createAnimatableComponent = function(component) {
       });
     },
 
+    lightSpeedIn: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.6, 1],
+          outputRange: [0, 1, 1],
+        }),
+        transform: [{
+          translateX: this.state.animationValue.interpolate({
+            inputRange: [0, 0.6, 1],
+            outputRange: [this._layout.width, 0, 0],
+          }),
+        }, {
+          skewX: this.state.animationValue.interpolate({
+            inputRange: [0, 0.6, 0.8, 1],
+            outputRange: ['-30 deg', '20 deg', '-5 deg', '0 deg'],
+          }),
+        }],
+      });
+    },
+
+    lightSpeedOut: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [1, 0],
+        }),
+        transform: [{
+          translateX: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, this._layout.width],
+          }),
+        }, {
+          skewX: this.state.animationValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['0 deg', '30 deg'],
+          }),
+        }],
+      });
+    },
+
     _fade: function(duration, direction, originOrDestination, isBig) {
       var style = {
         opacity: this.state.animationValue.interpolate({

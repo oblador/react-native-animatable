@@ -31,6 +31,16 @@ var getAnimationValueForDirection = function(direction, originOrDestination, ver
   return modifier * (isVertical ? verticalValue : horizontalValue);
 };
 
+// Animations starting with these keywords use element dimensions
+// thus, any animation needs to be deferred until the element is measured
+var LAYOUT_DEPENDENT_ANIMATIONS = [
+  'slide',
+  'fade',
+  'wobble',
+  'lightSpeed'
+];
+
+// Make (almost) any component animatable, similar to Animated.createAnimatedComponent
 var createAnimatableComponent = function(component) {
   var Animatable = Animated.createAnimatedComponent(component);
   return React.createClass({
@@ -59,6 +69,12 @@ var createAnimatableComponent = function(component) {
     componentWillMount: function() {
       var { animation, duration } = this.props;
       if(animation) {
+        for (var i = LAYOUT_DEPENDENT_ANIMATIONS.length - 1; i >= 0; i--) {
+          if(animation.indexOf(LAYOUT_DEPENDENT_ANIMATIONS[i]) === 0) {
+            this.setState({ scheduledAnimation: animation });
+            return;
+          }
+        };
         this[animation](duration);
       }
     },
@@ -67,12 +83,32 @@ var createAnimatableComponent = function(component) {
       var { animation, duration } = this.props;
       if(animation !== this.props.animation) {
         if(animation) {
-          this[animation](duration);
+          if(this.state.scheduledAnimation) {
+            this.setState({ scheduledAnimation: animation });
+          } else {
+            this[animation](duration);
+          }
         } else {
           this.setState({
+            scheduledAnimation: false,
             animationStyle: {},
           });
         }
+      }
+    },
+
+    _handleLayout: function(event) {
+      var { duration, onLayout } = this.props;
+      var { scheduledAnimation } = this.state;
+
+      this._layout = event.nativeEvent.layout;
+      if(onLayout) {
+        onLayout(event);
+      }
+
+      if(scheduledAnimation) {
+        this.setState({ scheduledAnimation: false });
+        this[scheduledAnimation](duration);
       }
     },
 
@@ -644,16 +680,14 @@ var createAnimatableComponent = function(component) {
 
     render: function() {
       var { style, children, onLayout, animation, duration, ...props } = this.props;
+      var { scheduledAnimation } = this.state;
+      var hideStyle = (scheduledAnimation && scheduledAnimation.indexOf('In') !== -1 ? { opacity: 0 } : false)
       return (<Animatable
-        onLayout={event => {
-          this._layout = event.nativeEvent.layout;
-          if(onLayout) {
-            onLayout(event);
-          }
-        }}
-        style={[this.state.animationStyle, style]}
-        {...props}>{children}</Animatable>);
+        {...props}
         ref={(component) => this._root = component}
+        onLayout={this._handleLayout}
+        style={[style, this.state.animationStyle, hideStyle]}
+        >{children}</Animatable>);
     }
   });
 };

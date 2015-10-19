@@ -3,6 +3,17 @@
 var React = require('react-native');
 var { View, Text, Image, Animated } = React;
 
+// Helper function to calculate transform values, args:
+// direction: in|out
+// originOrDestination: up|down|left|right
+// verticalValue: amplitude for up/down animations
+// horizontalValue: amplitude for left/right animations
+var getAnimationValueForDirection = function(direction, originOrDestination, verticalValue, horizontalValue) {
+  var isVertical = originOrDestination === 'up' || originOrDestination === 'down';
+  var modifier = (isVertical && direction === 'out' ? -1 : 1) * (originOrDestination === 'down' || originOrDestination === 'left' ? -1 : 1);
+  return modifier * (isVertical ? verticalValue : horizontalValue);
+};
+
 var createAnimatableComponent = function(component) {
   var Animatable = Animated.createAnimatedComponent(component);
   return React.createClass({
@@ -273,19 +284,11 @@ var createAnimatableComponent = function(component) {
       this._fade(duration, 'out', 'right');
     },
 
-    _getSlideTransformation: function(direction, originOrDestination) {
-      var animationValue;
-      switch(originOrDestination) {
-        case 'up':    animationValue = this._layout.height; break;
-        case 'down':  animationValue = -this._layout.height; break;
-        case 'left':  animationValue = -this._layout.width; break;
-        case 'right': animationValue = this._layout.width; break;
-      }
 
+    _getSlideTransformation: function(direction, originOrDestination, isBig) {
+      var size = (isBig ? Dimensions.get('window') : this._layout);
+      var animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
       var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
-      if(translateKey === 'translateY' && direction === 'out') {
-        animationValue = -animationValue;
-      }
 
       var transformation = {};
       transformation[translateKey] = this.state.animationValue.interpolate({

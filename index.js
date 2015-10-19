@@ -181,6 +181,95 @@ var createAnimatableComponent = function(component) {
       });
     },
 
+    _bounce: function(duration, direction, originOrDestination) {
+      var style = {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.55, 1]),
+          outputRange: (direction === 'in' ? [0, 1, 1] : [1, 1, 0]),
+        }),
+      };
+      if(originOrDestination) {
+        style.transform = createKeyedArray(this._getBounceTransformation(direction, originOrDestination));
+      }
+      this.animate(duration, style);
+    },
+
+    _getBounceTransformation: function(direction, originOrDestination) {
+      var windowSize = Dimensions.get('window');
+      var animationValue = getAnimationValueForDirection(direction, originOrDestination, windowSize.height, windowSize.width);
+      var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+      var modifier = animationValue > 0 ? 1 : -1;
+
+      var transformation = {};
+      transformation[translateKey] = this.state.animationValue.interpolate({
+        inputRange: (direction === 'in' ? [0, 0.6, 0.75, 0.9, 1] : [0, 0.2, 0.4, 0.45, 1]),
+        outputRange: (direction === 'in' ? [animationValue, 25 * modifier, -10 * modifier, 5 * modifier, 0] : [0, 10 * modifier, -20 * modifier, -20 * modifier, animationValue])
+      });
+      return transformation;
+    },
+
+    bounceIn: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.6, 1],
+          outputRange: [0, 1, 1],
+        }),
+        transform: [{
+          scale: this.state.animationValue.interpolate({
+            inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
+            outputRange: [0.3, 1.1, 0.9, 1.03, 0.97, 1],
+          }),
+        }],
+      });
+    },
+
+    bounceOut: function(duration) {
+      this.animate(duration, {
+        opacity: this.state.animationValue.interpolate({
+          inputRange: [0, 0.55, 1],
+          outputRange: [1, 1, 0],
+        }),
+        transform: [{
+          scale: this.state.animationValue.interpolate({
+            inputRange: [0, 0.2, 0.5, 0.55, 1],
+            outputRange: [1, 0.9, 1.1, 1.1, 0.3],
+          }),
+        }],
+      });
+    },
+
+    bounceInDown: function(duration) {
+      this._bounce(duration, 'in', 'down');
+    },
+
+    bounceInUp: function(duration) {
+      this._bounce(duration, 'in', 'up');
+    },
+
+    bounceInLeft: function(duration) {
+      this._bounce(duration, 'in', 'left');
+    },
+
+    bounceInRight: function(duration) {
+      this._bounce(duration, 'in', 'right');
+    },
+
+    bounceOutDown: function(duration) {
+      this._bounce(duration, 'out', 'down');
+    },
+
+    bounceOutUp: function(duration) {
+      this._bounce(duration, 'out', 'up');
+    },
+
+    bounceOutLeft: function(duration) {
+      this._bounce(duration, 'out', 'left');
+    },
+
+    bounceOutRight: function(duration) {
+      this._bounce(duration, 'out', 'right');
+    },
+
     flipInX: function(duration) {
       this.animate(duration, {
         opacity: this.state.animationValue.interpolate({

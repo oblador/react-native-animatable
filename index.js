@@ -231,7 +231,7 @@ var createAnimatableComponent = function(component) {
       });
     },
 
-    _fade: function(duration, direction, originOrDestination) {
+    _fade: function(duration, direction, originOrDestination, isBig) {
       var style = {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 1],
@@ -284,6 +284,37 @@ var createAnimatableComponent = function(component) {
       this._fade(duration, 'out', 'right');
     },
 
+    fadeInDownBig: function(duration) {
+      this._fade(duration, 'in', 'down', true);
+    },
+
+    fadeInUpBig: function(duration) {
+      this._fade(duration, 'in', 'up', true);
+    },
+
+    fadeInLeftBig: function(duration) {
+      this._fade(duration, 'in', 'left', true);
+    },
+
+    fadeInRightBig: function(duration) {
+      this._fade(duration, 'in', 'right', true);
+    },
+
+    fadeOutDownBig: function(duration) {
+      this._fade(duration, 'out', 'down', true);
+    },
+
+    fadeOutUpBig: function(duration) {
+      this._fade(duration, 'out', 'up', true);
+    },
+
+    fadeOutLeftBig: function(duration) {
+      this._fade(duration, 'out', 'left', true);
+    },
+
+    fadeOutRightBig: function(duration) {
+      this._fade(duration, 'out', 'right', true);
+    },
 
     _getSlideTransformation: function(direction, originOrDestination, isBig) {
       var size = (isBig ? Dimensions.get('window') : this._layout);

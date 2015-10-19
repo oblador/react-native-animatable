@@ -1,5 +1,21 @@
 # react-native-animatable
-Standard set of animations for React Native
+Standard set of easy to use animations for React Native
+
+## Declarative Usage
+
+```js
+var Animatable = require('react-native-animatable');
+var myFadingText = (<Animatable.Text animation="fadeIn">Fade me in plz</Animatable.Text>);
+```
+
+### Properties
+*Note: Other properties will be passed down to underlying component.*
+
+| Prop | Description | Default |
+|---|---|---|
+|**`animation`**|Name of the animation, see below for available animations. |*None*|
+|**`duration`**|For how long the animation will run (milliseconds). |`1000`|
+|**`delay`**|Optionally delay animation (milliseconds). |`0`|
 
 ## Imperative Usage
 

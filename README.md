@@ -49,7 +49,9 @@ React.createClass({
 };
 ```
 
-## Demo
+## Demo / Example
+
+See `Example` folder. 
 
 ![animatable-demo](https://cloud.githubusercontent.com/assets/378279/10567141/079de586-75c9-11e5-8ea4-e63c0176f519.gif)
 

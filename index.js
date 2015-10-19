@@ -47,6 +47,7 @@ var createAnimatableComponent = function(component) {
     propTypes: {
       animation: PropTypes.string,
       duration:  PropTypes.number,
+      delay:     PropTypes.number,
     },
 
     getDefaultProps: function() {
@@ -67,8 +68,17 @@ var createAnimatableComponent = function(component) {
     },
 
     componentWillMount: function() {
-      var { animation, duration } = this.props;
+      var { animation, duration, delay } = this.props;
       if(animation) {
+        if(delay) {
+          this.setState({ scheduledAnimation: animation });
+          this._timer = setTimeout(() =>{
+            this[animation](duration);
+            this.setState({ scheduledAnimation: false });
+            this._timer = false;
+          }, delay);
+          return;
+        }
         for (var i = LAYOUT_DEPENDENT_ANIMATIONS.length - 1; i >= 0; i--) {
           if(animation.indexOf(LAYOUT_DEPENDENT_ANIMATIONS[i]) === 0) {
             this.setState({ scheduledAnimation: animation });
@@ -76,6 +86,12 @@ var createAnimatableComponent = function(component) {
           }
         };
         this[animation](duration);
+      }
+    },
+
+    componentWillUnmount: function() {
+      if(this._timer) {
+        clearTimeout(this._timer);
       }
     },
 
@@ -93,6 +109,10 @@ var createAnimatableComponent = function(component) {
             scheduledAnimation: false,
             animationStyle: {},
           });
+          if(this._timer) {
+            clearTimeout(this._timer);
+            this._timer = false;
+          }
         }
       }
     },
@@ -679,7 +699,7 @@ var createAnimatableComponent = function(component) {
     },
 
     render: function() {
-      var { style, children, onLayout, animation, duration, ...props } = this.props;
+      var { style, children, onLayout, animation, duration, delay, ...props } = this.props;
       var { scheduledAnimation } = this.state;
       var hideStyle = (scheduledAnimation && scheduledAnimation.indexOf('In') !== -1 ? { opacity: 0 } : false)
       return (<Animatable

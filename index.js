@@ -1,7 +1,14 @@
 'use strict';
 
 var React = require('react-native');
-var { View, Text, Image, Animated } = React;
+var {
+  PropTypes,
+  Animated,
+  Dimensions,
+  View,
+  Text,
+  Image,
+} = React;
 
 // Transform an object to an array the way react native wants it for transform styles
 // { a: x, b: y } => [{ a: x }, { b: y }]
@@ -27,11 +34,42 @@ var getAnimationValueForDirection = function(direction, originOrDestination, ver
 var createAnimatableComponent = function(component) {
   var Animatable = Animated.createAnimatedComponent(component);
   return React.createClass({
+    propTypes: {
+      animation: PropTypes.string,
+      duration:  PropTypes.number,
+    },
+
+    getDefaultProps: function() {
+      return {
+        duration: 1000,
+      };
+    },
+
     getInitialState: function() {
       return {
         animationValue: new Animated.Value(0),
         animationStyle: {},
       };
+    },
+
+    componentWillMount: function() {
+      var { animation, duration } = this.props;
+      if(animation) {
+        this[animation](duration);
+      }
+    },
+
+    componentWillReceiveProps: function(props) {
+      var { animation, duration } = this.props;
+      if(animation !== this.props.animation) {
+        if(animation) {
+          this[animation](duration);
+        } else {
+          this.setState({
+            animationStyle: {},
+          });
+        }
+      }
     },
 
     animate: function(duration, animationStyle) {
@@ -40,7 +78,7 @@ var createAnimatableComponent = function(component) {
       this.setState({ animationStyle }, function() {
         Animated.timing(animationValue, {
           toValue: 1,
-          duration: duration || 1000
+          duration: duration || this.props.duration
         }).start();
       });
     },
@@ -601,7 +639,7 @@ var createAnimatableComponent = function(component) {
     },
 
     render: function() {
-      var { style, children, onLayout, ...props } = this.props;
+      var { style, children, onLayout, animation, duration, ...props } = this.props;
       return (<Animatable
         onLayout={event => {
           this._layout = event.nativeEvent.layout;

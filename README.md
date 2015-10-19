@@ -1,6 +1,10 @@
 # react-native-animatable
 Standard set of easy to use animations for React Native
 
+## Installation
+
+`$ npm install react-native-animatable --save`
+
 ## Usage
 
 To animate things you must use the `createAnimatableComponent` composer similar to the `Animated.createAnimatedComponent`. The common components `View`, `Text` and `Image` are precomposed and exposed under the `Animatable` namespace. If you have your own component that you wish to animate, simply wrap it with a `Animatable.View` or compose it with:
@@ -12,9 +16,8 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 
 ### Declarative Usage
 
-```js
-var Animatable = require('react-native-animatable');
-var myFadingText = (<Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>);
+```html
+<Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>;
 ```
 
 #### Properties

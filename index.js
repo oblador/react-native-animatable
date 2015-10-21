@@ -96,7 +96,7 @@ var createAnimatableComponent = function(component) {
     },
 
     componentWillReceiveProps: function(props) {
-      var { animation, duration } = this.props;
+      var { animation, duration } = props;
       if(animation !== this.props.animation) {
         if(animation) {
           if(this.state.scheduledAnimation) {

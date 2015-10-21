@@ -129,8 +129,7 @@ var createAnimatableComponent = function(component) {
         if(delay) {
           this.setState({ scheduledAnimation: animation });
           this._timer = setTimeout(() =>{
-            this[animation](duration);
-            this.setState({ scheduledAnimation: false });
+            this.setState({ scheduledAnimation: false }, () => this[animation](duration));
             this._timer = false;
           }, delay);
           return;
@@ -155,8 +154,7 @@ var createAnimatableComponent = function(component) {
       var { animation, duration, transition, transitionValue } = props;
       if(transition && transitionValue !== this.props.transitionValue) {
         this.transitionTo(transition, transitionValue, duration || this.props.duration);
-      }
-      if(animation !== this.props.animation) {
+      } else if(animation !== this.props.animation) {
         if(animation) {
           if(this.state.scheduledAnimation) {
             this.setState({ scheduledAnimation: animation });
@@ -185,9 +183,8 @@ var createAnimatableComponent = function(component) {
         onLayout(event);
       }
 
-      if(scheduledAnimation) {
-        this.setState({ scheduledAnimation: false });
-        this[scheduledAnimation](duration);
+      if(scheduledAnimation && !this._timer) {
+        this.setState({ scheduledAnimation: false }, () => this[scheduledAnimation](duration));
       }
     },
 

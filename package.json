@@ -1,6 +1,6 @@
 {
   "name": "react-native-animatable",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Standard set of easy to use animations for React Native",
   "main": "index.js",
   "scripts": {

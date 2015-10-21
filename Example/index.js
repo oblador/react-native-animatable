@@ -124,11 +124,11 @@ var Example = React.createClass({
   _animatables: {},
 
   getInitialState: function() {
-    return { duration: 1000 };
+    return { duration: 1000, toggledOn: true };
   },
 
   render: function() {
-    var { duration } = this.state;
+    var { duration, toggledOn } = this.state;
     var durationSlider;
     if(Platform.OS === 'ios') {
       durationSlider = (
@@ -146,6 +146,11 @@ var Example = React.createClass({
       <View animation="fadeIn" style={styles.container}>
         <Text style={styles.welcome}>Animatable Explorer</Text>
         {durationSlider}
+        <TouchableWithoutFeedback onPress={() => this.setState({ toggledOn: !toggledOn })}>
+          <View style={styles.toggle} transition="opacity" transitionValue={toggledOn ? 1 : 0.2}>
+            <Text style={styles.toggleText} transition="fontSize" transitionValue={toggledOn ? 14 : 11}>Toggle me!</Text>
+          </View>
+        </TouchableWithoutFeedback>
         <Text animation="zoomInDown" delay={600} style={styles.instructions}>
           Tap one of the following to animate for {duration} ms
         </Text>
@@ -193,6 +198,18 @@ var styles = StyleSheet.create({
   slider: {
     height: 30,
     margin: 10,
+  },
+  toggle: {
+    width: 120,
+    backgroundColor: '#333',
+    borderRadius: 3,
+    padding: 5,
+    alignSelf: 'center',
+    alignItems: 'center',
+    margin: 10,
+  },
+  toggleText: {
+    color: 'white',
   },
   sectionHeader: {
     borderTopWidth: 1 / PixelRatio.get(),

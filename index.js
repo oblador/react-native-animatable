@@ -45,21 +45,22 @@ var createAnimatableComponent = function(component) {
   var Animatable = Animated.createAnimatedComponent(component);
   return React.createClass({
     propTypes: {
-      animation: PropTypes.string,
-      duration:  PropTypes.number,
-      delay:     PropTypes.number,
-    },
-
-    getDefaultProps: function() {
-      return {
-        duration: 1000,
-      };
+      animation:        PropTypes.string,
+      transition:       PropTypes.string,
+      transitionValue:  PropTypes.number,
+      duration:         PropTypes.number,
+      delay:            PropTypes.number,
     },
 
     getInitialState: function() {
+      var animationValue = new Animated.Value(this.props.transitionValue || 0);
+      var animationStyle = {};
+      if(this.props.transition) {
+        animationStyle[this.props.transition] = animationValue;
+      }
       return {
-        animationValue: new Animated.Value(0),
-        animationStyle: {},
+        animationValue,
+        animationStyle,
       };
     },
 
@@ -96,7 +97,10 @@ var createAnimatableComponent = function(component) {
     },
 
     componentWillReceiveProps: function(props) {
-      var { animation, duration } = props;
+      var { animation, duration, transition, transitionValue } = props;
+      if(transition && transitionValue !== this.props.transitionValue) {
+        this._transitionToValue(duration || this.props.duration, transitionValue);
+      }
       if(animation !== this.props.animation) {
         if(animation) {
           if(this.state.scheduledAnimation) {
@@ -138,9 +142,24 @@ var createAnimatableComponent = function(component) {
       this.setState({ animationStyle }, function() {
         Animated.timing(animationValue, {
           toValue: 1,
-          duration: duration || this.props.duration
+          duration: duration || this.props.duration || 1000
         }).start();
       });
+    },
+
+    _transitionToValue: function(duration, toValue) {
+      var { animationValue } = this.state;
+      if(duration) {
+        Animated.timing(animationValue, {
+          toValue: toValue,
+          duration: duration
+        }).start();
+      } else {
+        Animated.spring(animationValue, {
+          toValue: toValue,
+          duration: duration
+        }).start();
+      }
     },
 
     bounce: function(duration) {
@@ -699,7 +718,10 @@ var createAnimatableComponent = function(component) {
     },
 
     render: function() {
-      var { style, children, onLayout, animation, duration, delay, ...props } = this.props;
+      var { style, children, onLayout, animation, duration, delay, transition, transitionValue, ...props } = this.props;
+      if(animation && transition) {
+        throw new Error('You cannot combine animation and transition props');
+      }
       var { scheduledAnimation } = this.state;
       var hideStyle = (scheduledAnimation && scheduledAnimation.indexOf('In') !== -1 ? { opacity: 0 } : false)
       return (<Animatable

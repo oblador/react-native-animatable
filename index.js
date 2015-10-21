@@ -41,6 +41,33 @@ var LAYOUT_DEPENDENT_ANIMATIONS = [
   'lightSpeed'
 ];
 
+// These styles need to be nested in a transform array
+var TRANSFORM_STYLE_PROPERTIES = [
+  'rotate',
+  'rotateX',
+  'rotateY',
+  'rotateZ',
+  'scale',
+  'scaleX',
+  'scaleY',
+  'translateX',
+  'translateY',
+  'skewX',
+  'skewY',
+];
+
+// Creates an initial animation style and takes care of transform wrapping if neccesary
+var getAnimationStyleForTransition = function(transition, animationValue) {
+  var animationStyle = {};
+  if(transition) {
+    animationStyle[transition] = animationValue;
+    if(TRANSFORM_STYLE_PROPERTIES.indexOf(transition) !== -1) {
+      animationStyle = { transform: [animationStyle] };
+    }
+  }
+  return animationStyle;
+};
+
 // Make (almost) any component animatable, similar to Animated.createAnimatedComponent
 var createAnimatableComponent = function(component) {
   var Animatable = Animated.createAnimatedComponent(component);
@@ -55,13 +82,9 @@ var createAnimatableComponent = function(component) {
 
     getInitialState: function() {
       var animationValue = new Animated.Value(this.props.transitionValue || 0);
-      var animationStyle = {};
-      if(this.props.transition) {
-        animationStyle[this.props.transition] = animationValue;
-      }
       return {
-        animationValue,
-        animationStyle,
+        animationValue: animationValue,
+        animationStyle: getAnimationStyleForTransition(this.props.transition, animationValue),
       };
     },
 
@@ -151,8 +174,7 @@ var createAnimatableComponent = function(component) {
     transition: function(property, fromValue, toValue, duration) {
       var { animationValue } = this.state;
       animationValue.setValue(fromValue);
-      var animationStyle = {};
-      animationStyle[property] = this.state.animationValue;
+      var animationStyle = getAnimationStyleForTransition(property, animationValue);
       this.setState({ animationStyle }, function() {
         this._transitionToValue(duration || this.props.duration, toValue);
       });

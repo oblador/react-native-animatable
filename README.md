@@ -16,8 +16,20 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 
 ### Declarative Usage
 
+#### Predefined Animations
+
 ```html
 <Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>;
+```
+
+#### Generic transitions
+
+You can create your own simple transitions of a style property of your own choosing. The following example will increase the font size by 5 for every tap – all animated, all declarative! If you don't supply a `duration` property, a spring animation will be used. 
+
+```html
+<TouchableOpacity onPress={() => this.setState({fontSize: (this.state.fontSize || 10) + 5 })}
+  <Animatable.Text transition="fontSize" transitionValue={this.state.fontSize || 10}>Size me up, Scotty</Animatable.Text>;
+</TouchableOpacity>
 ```
 
 #### Properties
@@ -28,8 +40,13 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 |**`animation`**|Name of the animation, see below for available animations. |*None*|
 |**`duration`**|For how long the animation will run (milliseconds). |`1000`|
 |**`delay`**|Optionally delay animation (milliseconds). |`0`|
+|**`transition`**|What property to transition, for example `opacity` or `fontSize`. |*None*|
+|**`transitionValue`**|Current value of the transition. |`0`|
 
 ### Imperative Usage
+
+
+#### Predefined Animations
 
 All animations are exposed as functions on Animatable elements, they take an optional `duration` argument.
 
@@ -39,10 +56,38 @@ var Animatable = require('react-native-animatable');
 React.createClass({
   render: function() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800);>
+      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800);}>
         <Animatable.View ref="view">
           <Text>Bounce me!</Text>
         </Animatable.View>
+      </TouchableWithoutFeedback>
+    );
+  }
+};
+```
+
+#### Generic transitions
+
+##### `transition(property, fromValue, toValue[, duration])`
+
+Will transition given style `property` between `fromValue` and `toValue`. If no `duration` is passed a spring animation will be used. 
+
+##### `transitionTo(property, toValue[, duration])`
+
+This function will try to determine the current value of the style `property` and pass it along to `transition()` as `fromValue`. This requires access to the StyleSheet registry which has long been a private api, but soon [this PR will expose it](https://github.com/facebook/react-native/pull/3308), in the meantime please polyfill like in the example below. If the property is already being transitioned either via a previous call to `transition()` or via the `transition` prop this it not neccessary.  
+
+```js
+// Polyfill StyleSheet.flatten if neccesary
+if(!StyleSheet.flatten) {
+  StyleSheet.flatten = require('flattenStyle');
+}
+var Animatable = require('react-native-animatable');
+
+React.createClass({
+  render: function() {
+    return (
+      <TouchableWithoutFeedback onPress={() => this.refs.text.transitionTo('opacity', 0.2);}>
+        <Animatable.Text ref="text">Fade me!</Animatable.Text>
       </TouchableWithoutFeedback>
     );
   }

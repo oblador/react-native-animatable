@@ -147,8 +147,8 @@ var Example = React.createClass({
         <Text style={styles.welcome}>Animatable Explorer</Text>
         {durationSlider}
         <TouchableWithoutFeedback onPress={() => this.setState({ toggledOn: !toggledOn })}>
-          <View style={styles.toggle} transition="opacity" transitionValue={toggledOn ? 1 : 0.2}>
-            <Text style={styles.toggleText} transition="fontSize" transitionValue={toggledOn ? 14 : 11}>Toggle me!</Text>
+          <View style={styles.toggle} transition="rotate" transitionValue={toggledOn ? '0deg' : '8deg'}>
+            <Text style={styles.toggleText} transition="color" transitionValue={toggledOn ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 33, 33, 1)'}>Toggle me!</Text>
           </View>
         </TouchableWithoutFeedback>
         <Text animation="zoomInDown" delay={600} style={styles.instructions}>

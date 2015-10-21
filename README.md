@@ -26,6 +26,8 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 
 You can create your own simple transitions of a style property of your own choosing. The following example will increase the font size by 5 for every tap – all animated, all declarative! If you don't supply a `duration` property, a spring animation will be used. 
 
+*Note: If you are using colors, please use `rgba()` syntax.*
+
 ```html
 <TouchableOpacity onPress={() => this.setState({fontSize: (this.state.fontSize || 10) + 5 })}
   <Animatable.Text transition="fontSize" transitionValue={this.state.fontSize || 10}>Size me up, Scotty</Animatable.Text>;
@@ -40,7 +42,7 @@ You can create your own simple transitions of a style property of your own choos
 |**`animation`**|Name of the animation, see below for available animations. |*None*|
 |**`duration`**|For how long the animation will run (milliseconds). |`1000`|
 |**`delay`**|Optionally delay animation (milliseconds). |`0`|
-|**`transition`**|What property to transition, for example `opacity` or `fontSize`. |*None*|
+|**`transition`**|What property to transition, for example `opacity`, `rotate` or `fontSize`. |*None*|
 |**`transitionValue`**|Current value of the transition. |`0`|
 
 ### Imperative Usage
@@ -98,7 +100,7 @@ React.createClass({
 
 See `Example` folder. 
 
-![animatable-demo](https://cloud.githubusercontent.com/assets/378279/10567141/079de586-75c9-11e5-8ea4-e63c0176f519.gif)
+![animatable-demo](https://cloud.githubusercontent.com/assets/378279/10629128/3c373324-779a-11e5-8311-a3a489575b75.gif)
 
 ## Animations
 

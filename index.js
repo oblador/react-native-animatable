@@ -220,16 +220,20 @@ var createAnimatableComponent = function(component) {
     },
 
     transitionTo: function(property, toValue, duration) {
-      if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1 && typeof this.state.currentTransitionValue !== 'undefined') {
-        this.transition(property, this.state.currentTransitionValue, toValue, duration);
+      var { currentTransitionValue } = this.state;
+      if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1 && typeof currentTransitionValue !== 'undefined') {
+        this.transition(property, currentTransitionValue, toValue, duration);
       } else if(this.state.animationStyle[property] === this.state.animationValue) {
         this._transitionToValue(toValue, duration);
       } else {
-        if(!StyleSheet.flatten) {
-          throw new Error('StyleSheet.flatten not available, upgrade React Native or polyfill with StyleSheet.flatten = require(\'flattenStyle\');')
+        if(typeof currentTransitionValue === 'undefined' && this.props.style) {
+          if(!StyleSheet.flatten) {
+            throw new Error('StyleSheet.flatten not available, upgrade React Native or polyfill with StyleSheet.flatten = require(\'flattenStyle\');')
+          }
+          var style = this.props.style ? StyleSheet.flatten(this.props.style) : {};
+          currentTransitionValue = style[property];
         }
-        var style = this.props.style ? StyleSheet.flatten(this.props.style) : {};
-        this.transition(property, style[property] || 0, toValue, duration);
+        this.transition(property, currentTransitionValue || 0, toValue, duration);
       }
     },
 

@@ -2,6 +2,7 @@
 
 var React = require('react-native');
 var {
+  StyleSheet,
   PropTypes,
   Animated,
   Dimensions,
@@ -145,6 +146,28 @@ var createAnimatableComponent = function(component) {
           duration: duration || this.props.duration || 1000
         }).start();
       });
+    },
+
+    transition: function(property, fromValue, toValue, duration) {
+      var { animationValue } = this.state;
+      animationValue.setValue(fromValue);
+      var animationStyle = {};
+      animationStyle[property] = this.state.animationValue;
+      this.setState({ animationStyle }, function() {
+        this._transitionToValue(duration || this.props.duration, toValue);
+      });
+    },
+
+    transitionTo: function(property, toValue, duration) {
+      if(this.state.animationStyle[property] === this.state.animationValue) {
+        this._transitionToValue(duration, toValue);
+      } else {
+        if(!StyleSheet.flatten) {
+          throw new Error('StyleSheet.flatten not available, upgrade React Native or polyfill with StyleSheet.flatten = require(\'flattenStyle\');')
+        }
+        var style = this.props.style ? StyleSheet.flatten(this.props.style) : {};
+        this.transition(property, style[property] || 0, toValue, duration);
+      }
     },
 
     _transitionToValue: function(duration, toValue) {

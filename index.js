@@ -56,11 +56,35 @@ var TRANSFORM_STYLE_PROPERTIES = [
   'skewY',
 ];
 
+// These styles are not number based and thus needs to be interpolated
+var INTERPOLATION_STYLE_PROPERTIES = [
+  // Transform styles
+  'rotate',
+  'rotateX',
+  'rotateY',
+  'rotateZ',
+  'skewX',
+  'skewY',
+  'transformMatrix',
+  // View styles
+  'backgroundColor',
+  'borderColor',
+  'borderTopColor',
+  'borderRightColor',
+  'borderBottomColor',
+  'borderLeftColor',
+  'shadowColor',
+  // Text styles
+  'color',
+  'textDecorationColor',
+  'fontWeight',
+];
+
 // Creates an initial animation style and takes care of transform wrapping if neccesary
-var getAnimationStyleForTransition = function(transition, animationValue) {
+var getAnimationStyleForTransition = function(transition, styleValue) {
   var animationStyle = {};
   if(transition) {
-    animationStyle[transition] = animationValue;
+    animationStyle[transition] = styleValue;
     if(TRANSFORM_STYLE_PROPERTIES.indexOf(transition) !== -1) {
       animationStyle = { transform: [animationStyle] };
     }
@@ -75,16 +99,23 @@ var createAnimatableComponent = function(component) {
     propTypes: {
       animation:        PropTypes.string,
       transition:       PropTypes.string,
-      transitionValue:  PropTypes.number,
+      transitionValue:  PropTypes.any,
       duration:         PropTypes.number,
       delay:            PropTypes.number,
     },
 
     getInitialState: function() {
-      var animationValue = new Animated.Value(this.props.transitionValue || 0);
+      var animationValue, styleValue;
+      if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1) {
+        animationValue = new Animated.Value(0);
+        styleValue = this.props.transitionValue;
+      } else {
+        animationValue = styleValue = new Animated.Value(this.props.transitionValue || 0);
+      }
       return {
         animationValue: animationValue,
-        animationStyle: getAnimationStyleForTransition(this.props.transition, animationValue),
+        currentTransitionValue: this.props.transitionValue,
+        animationStyle: getAnimationStyleForTransition(this.props.transition, styleValue),
       };
     },
 
@@ -123,7 +154,7 @@ var createAnimatableComponent = function(component) {
     componentWillReceiveProps: function(props) {
       var { animation, duration, transition, transitionValue } = props;
       if(transition && transitionValue !== this.props.transitionValue) {
-        this._transitionToValue(duration || this.props.duration, transitionValue);
+        this.transitionTo(transition, transitionValue, duration || this.props.duration);
       }
       if(animation !== this.props.animation) {
         if(animation) {
@@ -172,17 +203,30 @@ var createAnimatableComponent = function(component) {
     },
 
     transition: function(property, fromValue, toValue, duration) {
-      var { animationValue } = this.state;
-      animationValue.setValue(fromValue);
-      var animationStyle = getAnimationStyleForTransition(property, animationValue);
-      this.setState({ animationStyle }, function() {
-        this._transitionToValue(duration || this.props.duration, toValue);
+      var { animationValue, currentTransitionValue } = this.state;
+      var styleValue = animationValue;
+      if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1) {
+        animationValue.setValue(0);
+        styleValue = animationValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [currentTransitionValue, toValue],
+        });
+        currentTransitionValue = toValue;
+        toValue = 1;
+      } else {
+        animationValue.setValue(fromValue);
+      }
+      var animationStyle = getAnimationStyleForTransition(property, styleValue);
+      this.setState({ animationStyle, currentTransitionValue }, function() {
+        this._transitionToValue(toValue, duration || this.props.duration);
       });
     },
 
     transitionTo: function(property, toValue, duration) {
-      if(this.state.animationStyle[property] === this.state.animationValue) {
-        this._transitionToValue(duration, toValue);
+      if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1 && typeof this.state.currentTransitionValue !== 'undefined') {
+        this.transition(property, this.state.currentTransitionValue, toValue, duration);
+      } else if(this.state.animationStyle[property] === this.state.animationValue) {
+        this._transitionToValue(toValue, duration);
       } else {
         if(!StyleSheet.flatten) {
           throw new Error('StyleSheet.flatten not available, upgrade React Native or polyfill with StyleSheet.flatten = require(\'flattenStyle\');')
@@ -192,7 +236,7 @@ var createAnimatableComponent = function(component) {
       }
     },
 
-    _transitionToValue: function(duration, toValue) {
+    _transitionToValue: function(toValue, duration) {
       var { animationValue } = this.state;
       if(duration) {
         Animated.timing(animationValue, {

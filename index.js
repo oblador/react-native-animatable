@@ -102,6 +102,18 @@ var createAnimatableComponent = function(component) {
       transitionValue:  PropTypes.any,
       duration:         PropTypes.number,
       delay:            PropTypes.number,
+      iterationCount:   function(props, propName, componentName) {
+        var val = props[propName];
+        if(val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {
+          return new Error('iterationCount must be a positive number or "infinite"');
+        }
+      },
+    },
+
+    getDefaultProps: function() {
+      return {
+        iterationCount: 1,
+      }
     },
 
     getInitialState: function() {
@@ -113,6 +125,7 @@ var createAnimatableComponent = function(component) {
         animationValue = styleValue = new Animated.Value(this.props.transitionValue || 0);
       }
       return {
+        iterationCount: 0,
         animationValue: animationValue,
         currentTransitionValue: this.props.transitionValue,
         animationStyle: getAnimationStyleForTransition(this.props.transition, styleValue),
@@ -184,18 +197,33 @@ var createAnimatableComponent = function(component) {
       }
 
       if(scheduledAnimation && !this._timer) {
-        this.setState({ scheduledAnimation: false }, () => this[scheduledAnimation](duration));
+        this.setState({ scheduledAnimation: false }, () => {
+          this[scheduledAnimation](duration);
+        });
       }
     },
 
     animate: function(duration, animationStyle) {
       var { animationValue } = this.state;
       animationValue.setValue(0);
-      this.setState({ animationStyle }, function() {
-        Animated.timing(animationValue, {
-          toValue: 1,
-          duration: duration || this.props.duration || 1000
-        }).start();
+      this.setState({
+        iterationCount: 0,
+        animationStyle
+      }, () => this._startAnimation(duration));
+    },
+
+    _startAnimation: function(duration) {
+      var { animationValue, iterationCount } = this.state;
+      animationValue.setValue(0);
+      Animated.timing(animationValue, {
+        toValue: 1,
+        duration: duration || this.props.duration || 1000
+      }).start(() => {
+        iterationCount++;
+        if(this.props.iterationCount === 'infinite' || iterationCount < this.props.iterationCount) {
+          this._startAnimation();
+        }
+        this.setState({ iterationCount });
       });
     },
 

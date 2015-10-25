@@ -105,8 +105,8 @@ var getAnimationStyleForTransition = function(transition, styleValue) {
 var getAnimationTarget = function(iteration, direction) {
   switch(direction) {
     case 'reverse': return 0;
-    case 'alternate': return (iteration % 2) ? 1 : 0;
-    case 'alternate-reverse': return (iteration % 2) ? 0 : 1;
+    case 'alternate': return (iteration % 2) ? 0 : 1;
+    case 'alternate-reverse': return (iteration % 2) ? 1 : 0;
     case 'normal':
     default: return 1;
   }
@@ -245,7 +245,11 @@ var createAnimatableComponent = function(component) {
       animationValue.setValue(fromValue);
 
       // This is on the way back reverse
-      if(((direction === 'alternate' && toValue) || (direction === 'alternate-reverse' && !toValue)) && easing.match(/^ease\-(in|out)$/)) {
+      if((
+          (direction === 'reverse') ||
+          (direction === 'alternate' && !toValue) ||
+          (direction === 'alternate-reverse' && !toValue)
+        ) && easing.match(/^ease\-(in|out)$/)) {
         if(easing.indexOf('-in') !== -1) {
           easing = easing.replace('-in', '-out');
         } else {

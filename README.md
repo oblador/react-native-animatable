@@ -1,5 +1,5 @@
 # react-native-animatable
-Standard set of easy to use animations for React Native
+Standard set of easy to use animations and declarative transitions for React Native
 
 ## Installation
 
@@ -19,8 +19,19 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 #### Predefined Animations
 
 ```html
-<Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>;
+<Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>
 ```
+
+#### Looping
+
+To make looping animations simply set the `iterationCount` to `infinite`. Most animations except the attention seekers work best when setting `direction` to `alternate`. 
+
+```html
+<Animatable.Text animation="slideInDown" iterationCount={5} direction="alternate">Up and down you go</Animatable.Text>
+<Animatable.Text animation="pulse" easing="ease-out" iterationCount="infinite" style={{ textAlign: 'center' }}>❤️</Animatable.Text>
+```
+
+![Animatable looping demo](https://cloud.githubusercontent.com/assets/378279/10715976/efc042d4-7afe-11e5-978f-a84e91f3735a.gif)
 
 #### Generic transitions
 
@@ -42,6 +53,9 @@ You can create your own simple transitions of a style property of your own choos
 |**`animation`**|Name of the animation, see below for available animations. |*None*|
 |**`duration`**|For how long the animation will run (milliseconds). |`1000`|
 |**`delay`**|Optionally delay animation (milliseconds). |`0`|
+|**`direction`**|Direction of animation, especially useful for repeating animations. Valid values: `normal`, `reverse`, `alternate`, `alternate-reverse`. |`normal`|
+|**`easing`**|Timing function for the animation. Valid values: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`. |`ease-in-out`|
+|**`iterationCount`**|How many times to run the animation, use `infinite` for looped animations. |`1`|
 |**`transition`**|What property to transition, for example `opacity`, `rotate` or `fontSize`. |*None*|
 |**`transitionValue`**|Current value of the transition. |`0`|
 
@@ -70,11 +84,11 @@ React.createClass({
 
 #### Generic transitions
 
-##### `transition(property, fromValue, toValue[, duration])`
+##### `transition(property, fromValue, toValue[[, duration], easing])`
 
-Will transition given style `property` between `fromValue` and `toValue`. If no `duration` is passed a spring animation will be used. 
+Will transition given style `property` between `fromValue` and `toValue`. If no `duration` or `easing` is passed a spring animation will be used. 
 
-##### `transitionTo(property, toValue[, duration])`
+##### `transitionTo(property, toValue[[, duration], easing])`
 
 This function will try to determine the current value of the style `property` and pass it along to `transition()` as `fromValue`. This requires access to the StyleSheet registry which has long been a private api, but soon [this PR will expose it](https://github.com/facebook/react-native/pull/3308), in the meantime please polyfill like in the example below. If the property is already being transitioned either via a previous call to `transition()` or via the `transition` prop this it not neccessary.  
 
@@ -222,6 +236,7 @@ Animations are heavily inspired by [Animated.css](https://daneden.github.io/anim
 * `zoomOutLeft`
 * `zoomOutRight`
 
+## [Changelog](https://github.com/oblador/react-native-animatable/releases)
 
 ## License
 

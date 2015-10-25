@@ -140,7 +140,6 @@ var createAnimatableComponent = function(component) {
     getDefaultProps: function() {
       return {
         iterationCount: 1,
-        easing: 'ease-in-out',
       }
     },
 
@@ -191,9 +190,9 @@ var createAnimatableComponent = function(component) {
     },
 
     componentWillReceiveProps: function(props) {
-      var { animation, duration, transition, transitionValue } = props;
+      var { animation, duration, easing, transition, transitionValue } = props;
       if(transition && transitionValue !== this.props.transitionValue) {
-        this.transitionTo(transition, transitionValue, duration || this.props.duration);
+        this.transitionTo(transition, transitionValue, duration, easing);
       } else if(animation !== this.props.animation) {
         if(animation) {
           if(this.state.scheduledAnimation) {
@@ -239,6 +238,7 @@ var createAnimatableComponent = function(component) {
     _startAnimation: function(duration, iteration) {
       var { animationValue } = this.state;
       var { direction, easing, iterationCount } = this.props;
+      easing = easing || 'ease-in-out';
       iteration = iteration || 0;
       var fromValue = getAnimationOrigin(iteration, direction);
       var toValue = getAnimationTarget(iteration, direction);
@@ -268,7 +268,7 @@ var createAnimatableComponent = function(component) {
       });
     },
 
-    transition: function(property, fromValue, toValue, duration) {
+    transition: function(property, fromValue, toValue, duration, easing) {
       var { animationValue, currentTransitionValue } = this.state;
       var styleValue = animationValue;
       if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1) {
@@ -284,16 +284,16 @@ var createAnimatableComponent = function(component) {
       }
       var animationStyle = getAnimationStyleForTransition(property, styleValue);
       this.setState({ animationStyle, currentTransitionValue }, function() {
-        this._transitionToValue(toValue, duration || this.props.duration);
+        this._transitionToValue(toValue, duration || this.props.duration, easing);
       });
     },
 
-    transitionTo: function(property, toValue, duration) {
+    transitionTo: function(property, toValue, duration, easing) {
       var { currentTransitionValue } = this.state;
       if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1 && typeof currentTransitionValue !== 'undefined') {
-        this.transition(property, currentTransitionValue, toValue, duration);
+        this.transition(property, currentTransitionValue, toValue, duration, easing);
       } else if(this.state.animationStyle[property] === this.state.animationValue) {
-        this._transitionToValue(toValue, duration);
+        this._transitionToValue(toValue, duration, easing);
       } else {
         if(typeof currentTransitionValue === 'undefined' && this.props.style) {
           if(!StyleSheet.flatten) {
@@ -302,16 +302,17 @@ var createAnimatableComponent = function(component) {
           var style = this.props.style ? StyleSheet.flatten(this.props.style) : {};
           currentTransitionValue = style[property];
         }
-        this.transition(property, currentTransitionValue || 0, toValue, duration);
+        this.transition(property, currentTransitionValue || 0, toValue, duration, easing);
       }
     },
 
-    _transitionToValue: function(toValue, duration) {
+    _transitionToValue: function(toValue, duration, easing) {
       var { animationValue } = this.state;
-      if(duration) {
+      if(duration || easing) {
         Animated.timing(animationValue, {
           toValue: toValue,
-          duration: duration
+          duration: duration || 1000,
+          easing: EASING_FUNCTIONS[easing || 'ease-in-out']
         }).start();
       } else {
         Animated.spring(animationValue, {

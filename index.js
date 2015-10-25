@@ -92,6 +92,22 @@ var getAnimationStyleForTransition = function(transition, styleValue) {
   return animationStyle;
 };
 
+// Determine to what value the animation should tween to
+var getAnimationTarget = function(iteration, direction) {
+  switch(direction) {
+    case 'reverse': return 0;
+    case 'alternate': return (iteration % 2) ? 1 : 0;
+    case 'alternate-reverse': return (iteration % 2) ? 0 : 1;
+    case 'normal':
+    default: return 1;
+  }
+};
+
+// Like getAnimationTarget but opposite
+var getAnimationOrigin = function(iteration, direction) {
+  return getAnimationTarget(iteration, direction) ? 0 : 1;
+};
+
 // Make (almost) any component animatable, similar to Animated.createAnimatedComponent
 var createAnimatableComponent = function(component) {
   var Animatable = Animated.createAnimatedComponent(component);
@@ -101,6 +117,7 @@ var createAnimatableComponent = function(component) {
       transition:       PropTypes.string,
       transitionValue:  PropTypes.any,
       duration:         PropTypes.number,
+      direction:        PropTypes.oneOf(['normal', 'reverse', 'alternate', 'alternate-reverse']),
       delay:            PropTypes.number,
       iterationCount:   function(props, propName, componentName) {
         var val = props[propName];
@@ -119,13 +136,12 @@ var createAnimatableComponent = function(component) {
     getInitialState: function() {
       var animationValue, styleValue;
       if(INTERPOLATION_STYLE_PROPERTIES.indexOf(this.props.transition) !== -1) {
-        animationValue = new Animated.Value(0);
+        animationValue = new Animated.Value(getAnimationOrigin(0, this.props.direction));
         styleValue = this.props.transitionValue;
       } else {
         animationValue = styleValue = new Animated.Value(this.props.transitionValue || 0);
       }
       return {
-        iterationCount: 0,
         animationValue: animationValue,
         currentTransitionValue: this.props.transitionValue,
         animationStyle: getAnimationStyleForTransition(this.props.transition, styleValue),
@@ -204,26 +220,25 @@ var createAnimatableComponent = function(component) {
     },
 
     animate: function(duration, animationStyle) {
-      var { animationValue } = this.state;
-      animationValue.setValue(0);
       this.setState({
-        iterationCount: 0,
         animationStyle
       }, () => this._startAnimation(duration));
     },
 
-    _startAnimation: function(duration) {
-      var { animationValue, iterationCount } = this.state;
-      animationValue.setValue(0);
+    _startAnimation: function(duration, iteration) {
+      var { animationValue } = this.state;
+      iteration = iteration || 0;
+      animationValue.setValue(getAnimationOrigin(iteration, this.props.direction));
       Animated.timing(animationValue, {
-        toValue: 1,
+        toValue: getAnimationTarget(iteration, this.props.direction),
         duration: duration || this.props.duration || 1000
-      }).start(() => {
-        iterationCount++;
-        if(this.props.iterationCount === 'infinite' || iterationCount < this.props.iterationCount) {
-          this._startAnimation();
+      }).start(endState => {
+        iteration++;
+        if(endState.finished && this.props.animation && (this.props.iterationCount === 'infinite' || iteration < this.props.iterationCount)) {
+          this._startAnimation(duration, iteration);
         }
-        this.setState({ iterationCount });
+      });
+    },
       });
     },
 

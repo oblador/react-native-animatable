@@ -5,6 +5,7 @@ var {
   StyleSheet,
   PropTypes,
   Animated,
+  Easing,
   Dimensions,
   View,
   Text,
@@ -80,6 +81,14 @@ var INTERPOLATION_STYLE_PROPERTIES = [
   'fontWeight',
 ];
 
+var EASING_FUNCTIONS = {
+  'linear':      Easing.linear,
+  'ease':        Easing.ease,
+  'ease-in':     Easing.in(Easing.ease),
+  'ease-out':    Easing.out(Easing.ease),
+  'ease-in-out': Easing.inOut(Easing.ease),
+};
+
 // Creates an initial animation style and takes care of transform wrapping if neccesary
 var getAnimationStyleForTransition = function(transition, styleValue) {
   var animationStyle = {};
@@ -119,6 +128,7 @@ var createAnimatableComponent = function(component) {
       duration:         PropTypes.number,
       direction:        PropTypes.oneOf(['normal', 'reverse', 'alternate', 'alternate-reverse']),
       delay:            PropTypes.number,
+      easing:           PropTypes.oneOf(Object.keys(EASING_FUNCTIONS)),
       iterationCount:   function(props, propName, componentName) {
         var val = props[propName];
         if(val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {
@@ -130,6 +140,7 @@ var createAnimatableComponent = function(component) {
     getDefaultProps: function() {
       return {
         iterationCount: 1,
+        easing: 'ease-in-out',
       }
     },
 
@@ -227,18 +238,29 @@ var createAnimatableComponent = function(component) {
 
     _startAnimation: function(duration, iteration) {
       var { animationValue } = this.state;
+      var { direction, easing, iterationCount } = this.props;
       iteration = iteration || 0;
-      animationValue.setValue(getAnimationOrigin(iteration, this.props.direction));
+      var fromValue = getAnimationOrigin(iteration, direction);
+      var toValue = getAnimationTarget(iteration, direction);
+      animationValue.setValue(fromValue);
+
+      // This is on the way back reverse
+      if(((direction === 'alternate' && toValue) || (direction === 'alternate-reverse' && !toValue)) && easing.match(/^ease\-(in|out)$/)) {
+        if(easing.indexOf('-in') !== -1) {
+          easing = easing.replace('-in', '-out');
+        } else {
+          easing = easing.replace('-out', '-in');
+        }
+      }
       Animated.timing(animationValue, {
-        toValue: getAnimationTarget(iteration, this.props.direction),
+        toValue: toValue,
+        easing: EASING_FUNCTIONS[easing],
         duration: duration || this.props.duration || 1000
       }).start(endState => {
         iteration++;
-        if(endState.finished && this.props.animation && (this.props.iterationCount === 'infinite' || iteration < this.props.iterationCount)) {
+        if(endState.finished && this.props.animation && (iterationCount === 'infinite' || iteration < iterationCount)) {
           this._startAnimation(duration, iteration);
         }
-      });
-    },
       });
     },
 

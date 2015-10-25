@@ -31,7 +31,7 @@ To make looping animations simply set the `iterationCount` to `infinite`. Most a
 <Animatable.Text animation="pulse" easing="ease-out" iterationCount="infinite" style={{ textAlign: 'center' }}>❤️</Animatable.Text>
 ```
 
-![Animatable looping demo](https://cloud.githubusercontent.com/assets/378279/10715976/efc042d4-7afe-11e5-978f-a84e91f3735a.gif)
+![Animatable looping demo](https://cloud.githubusercontent.com/assets/378279/10716023/9f4a6670-7b00-11e5-944c-d52a1dcf0884.gif)
 
 #### Generic transitions
 

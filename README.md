@@ -41,7 +41,7 @@ You can create your own simple transitions of a style property of your own choos
 
 ```html
 <TouchableOpacity onPress={() => this.setState({fontSize: (this.state.fontSize || 10) + 5 })}
-  <Animatable.Text transition="fontSize" transitionValue={this.state.fontSize || 10}>Size me up, Scotty</Animatable.Text>;
+  <Animatable.Text transition="fontSize" transitionValue={this.state.fontSize || 10}>Size me up, Scotty</Animatable.Text>
 </TouchableOpacity>
 ```
 

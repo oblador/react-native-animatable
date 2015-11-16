@@ -259,6 +259,7 @@ var createAnimatableComponent = function(component) {
       Animated.timing(animationValue, {
         toValue: toValue,
         easing: EASING_FUNCTIONS[easing],
+        isInteraction: !iterationCount,
         duration: duration || this.props.duration || 1000
       }).start(endState => {
         iteration++;

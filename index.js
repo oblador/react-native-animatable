@@ -162,7 +162,7 @@ var createAnimatableComponent = function(component) {
       this._root.setNativeProps(nativeProps);
     },
 
-    componentWillMount: function() {
+    componentDidMount: function() {
       var { animation, duration, delay } = this.props;
       if(animation) {
         if(delay) {

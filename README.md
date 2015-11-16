@@ -82,6 +82,8 @@ React.createClass({
 };
 ```
 
+To stop any ongoing animations, just invoke `stopAnimation()` on that element. 
+
 #### Generic transitions
 
 ##### `transition(property, fromValue, toValue[[, duration], easing])`

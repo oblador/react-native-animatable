@@ -201,14 +201,7 @@ var createAnimatableComponent = function(component) {
             this[animation](duration);
           }
         } else {
-          this.setState({
-            scheduledAnimation: false,
-            animationStyle: {},
-          });
-          if(this._timer) {
-            clearTimeout(this._timer);
-            this._timer = false;
-          }
+          this.stopAnimation();
         }
       }
     },
@@ -233,6 +226,18 @@ var createAnimatableComponent = function(component) {
       this.setState({
         animationStyle
       }, () => this._startAnimation(duration));
+    },
+
+    stopAnimation: function() {
+      this.setState({
+        scheduledAnimation: false,
+        animationStyle: {},
+      });
+      this.state.animationValue.stopAnimation();
+      if(this._timer) {
+        clearTimeout(this._timer);
+        this._timer = false;
+      }
     },
 
     _startAnimation: function(duration, iteration) {

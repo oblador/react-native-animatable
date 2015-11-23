@@ -19,6 +19,10 @@ var { createAnimatableComponent, View, Text } = require('react-native-animatable
 var Accordion = require('react-native-collapsible/Accordion');
 ScrollView = createAnimatableComponent(ScrollView);
 
+if(!StyleSheet.flatten) {
+  StyleSheet.flatten = require('flattenStyle');
+}
+
 var COLORS = [
    '#65b237', // green
    '#346ca5', // blue
@@ -124,7 +128,7 @@ var Example = React.createClass({
   _animatables: {},
 
   getInitialState: function() {
-    return { duration: 1000, toggledOn: true };
+    return { duration: 1000, toggledOn: false };
   },
 
   render: function() {
@@ -147,9 +151,7 @@ var Example = React.createClass({
         <Text style={styles.welcome}>Animatable Explorer</Text>
         {durationSlider}
         <TouchableWithoutFeedback onPress={() => this.setState({ toggledOn: !toggledOn })}>
-          <View style={styles.toggle} transition="rotate" transitionValue={toggledOn ? '0deg' : '8deg'}>
-            <Text style={styles.toggleText} transition="color" transitionValue={toggledOn ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 33, 33, 1)'}>Toggle me!</Text>
-          </View>
+          <Text style={[styles.toggle, toggledOn && styles.toggledOn]} transition={['color', 'rotate', 'fontSize']}>Toggle me!</Text>
         </TouchableWithoutFeedback>
         <Text animation="zoomInDown" delay={600} style={styles.instructions}>
           Tap one of the following to animate for {duration} ms
@@ -204,12 +206,20 @@ var styles = StyleSheet.create({
     backgroundColor: '#333',
     borderRadius: 3,
     padding: 5,
+    fontSize: 14,
     alignSelf: 'center',
-    alignItems: 'center',
+    textAlign: 'center',
     margin: 10,
+    color: 'rgba(255, 255, 255, 1)',
   },
-  toggleText: {
-    color: 'white',
+  toggledOn: {
+    color: 'rgba(255, 33, 33, 1)',
+    fontSize: 16,
+    transform: [{
+      rotate: '8deg'
+    }, {
+      translateY: -20
+    }]
   },
   sectionHeader: {
     borderTopWidth: 1 / PixelRatio.get(),

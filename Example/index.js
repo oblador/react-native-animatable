@@ -135,7 +135,7 @@ var Example = React.createClass({
         <View animation="tada" delay={3000}>
           <SliderIOS
             style={styles.slider}
-            value={duration}
+            value={1000}
             onValueChange={duration => this.setState({ duration: Math.round(duration) })}
             maximumValue={2000}
           />

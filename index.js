@@ -135,6 +135,9 @@ var getDefaultStyleValue = function(key) {
   if(key === 'fontSize') {
     return 14;
   }
+  if(key === 'opacity') {
+    return 1;
+  }
   return 0;
 };
 

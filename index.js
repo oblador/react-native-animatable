@@ -400,21 +400,30 @@ var createAnimatableComponent = function(component) {
 
       var { currentTransitionValues } = this.state;
 
+      var transitions = {
+        from: {},
+        to: {},
+      };
+
       Object.keys(toValues).forEach(property => {
         var toValue = toValues[property];
-        var currentTransitionValue = currentTransitionValues[property];
-        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 && typeof currentTransitionValues[property] !== 'undefined') {
-          this.transition(property, currentTransitionValue, toValue, duration, easing);
-        } else if(this.state.transitionStyle[property] === this.state.transitionValues[property]) {
-          this._transitionToValue(this.state.transitionValues[property], toValue, duration, easing);
-        } else {
-          if(typeof currentTransitionValue === 'undefined' && this.props.style) {
-            var style = getStyleValues(property, this.props.style);
-            currentTransitionValue = style[property];
-          }
-          this.transition(property, currentTransitionValue, toValue, duration, easing);
+
+        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(property) === -1 && this.state.transitionStyle[property] === this.state.transitionValues[property]) {
+          return this._transitionToValue(this.state.transitionValues[property], toValue, duration, easing);
         }
+
+        var currentTransitionValue = currentTransitionValues[property];
+        if(typeof currentTransitionValue === 'undefined' && this.props.style) {
+          var style = getStyleValues(property, this.props.style);
+          currentTransitionValue = style[property];
+        }
+        transitions.from[property] = currentTransitionValue;
+        transitions.to[property] = toValue;
       });
+
+      if(Object.keys(transitions.from).length) {
+        this.transition(transitions.from, transitions.to, duration, easing);
+      }
     },
 
     _transitionToValues: function(toValues, duration, easing) {

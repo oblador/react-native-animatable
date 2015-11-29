@@ -1,5 +1,5 @@
 # react-native-animatable
-Standard set of easy to use animations and declarative transitions for React Native
+Easy to use declarative transitions and a standard set of animations for React Native
 
 ## Installation
 

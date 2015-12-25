@@ -60,13 +60,14 @@ You can create your own simple transitions of a style property of your own choos
 |**`easing`**|Timing function for the animation. Valid values: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`. |`ease-in-out`|
 |**`iterationCount`**|How many times to run the animation, use `infinite` for looped animations. |`1`|
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
+|**`onAnimationEnd`**|A function that is called when then animation has been completed successfully. |*None*|
 
 ### Imperative Usage
 
 
 #### Predefined Animations
 
-All animations are exposed as functions on Animatable elements, they take an optional `duration` argument.
+All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully and rejected when the animation is cancelled. 
 
 ```js
 var Animatable = require('react-native-animatable');
@@ -74,7 +75,7 @@ var Animatable = require('react-native-animatable');
 React.createClass({
   render: function() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800);}>
+      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then(() => console.log('bounce finished');}>
         <Animatable.View ref="view">
           <Text>Bounce me!</Text>
         </Animatable.View>

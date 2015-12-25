@@ -300,9 +300,17 @@ var createAnimatableComponent = function(component) {
     },
 
     animate: function(duration, animationStyle) {
-      this.setState({
-        animationStyle
-      }, () => this._startAnimation(duration));
+      return new Promise((resolve, reject) => {
+        this.setState({
+          animationStyle
+        }, () => this._startAnimation(duration, 0, endState => {
+          if(endState.finished) {
+            resolve();
+          } else {
+            reject();
+          }
+        }));
+      });
     },
 
     stopAnimation: function() {
@@ -317,7 +325,7 @@ var createAnimatableComponent = function(component) {
       }
     },
 
-    _startAnimation: function(duration, iteration) {
+    _startAnimation: function(duration, iteration, callback) {
       var { animationValue } = this.state;
       var { direction, easing, iterationCount } = this.props;
       easing = easing || 'ease-in-out';
@@ -347,6 +355,8 @@ var createAnimatableComponent = function(component) {
         iteration++;
         if(endState.finished && this.props.animation && (iterationCount === 'infinite' || iteration < iterationCount)) {
           this._startAnimation(duration, iteration);
+        } else if(callback) {
+          callback(endState);
         }
       });
     },
@@ -449,7 +459,7 @@ var createAnimatableComponent = function(component) {
     },
 
     bounce: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           translateY: this.state.animationValue.interpolate({
             inputRange: [0, 0.2, 0.4, 0.43, 0.53, 0.7, 0.8, 0.9, 1],
@@ -467,7 +477,7 @@ var createAnimatableComponent = function(component) {
         inputRange.push(i/times);
         outputRange.push(i % 2 ? 0 : 1);
       }
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange, outputRange
         }),
@@ -486,7 +496,7 @@ var createAnimatableComponent = function(component) {
       inputRange.push(1);
       outputRange.push('0 deg');
 
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           skewX: this.state.animationValue.interpolate({ inputRange, outputRange })
         }, {
@@ -496,7 +506,7 @@ var createAnimatableComponent = function(component) {
     },
 
     pulse: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           scale: this.state.animationValue.interpolate({
             inputRange: [0, 0.5, 1],
@@ -507,7 +517,7 @@ var createAnimatableComponent = function(component) {
     },
 
     rubberBand: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           scaleX: this.state.animationValue.interpolate({
             inputRange: [0, 0.3, 0.4, 0.5, 0.65, 0.75, 1],
@@ -531,7 +541,7 @@ var createAnimatableComponent = function(component) {
         inputRange.push(i/times);
         outputRange.push(i === times ? 0 : (i%2 ? 1 : -1) * distance);
       }
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           translateX: this.state.animationValue.interpolate({
             inputRange, outputRange
@@ -541,7 +551,7 @@ var createAnimatableComponent = function(component) {
     },
 
     swing: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           rotateZ: this.state.animationValue.interpolate({
             inputRange: [0, 0.2, 0.4, 0.6, 0.8, 1],
@@ -552,7 +562,7 @@ var createAnimatableComponent = function(component) {
     },
 
     tada: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           scale: this.state.animationValue.interpolate({
             inputRange: [0, 0.1, 0.2, 0.3, 0.9, 1],
@@ -569,7 +579,7 @@ var createAnimatableComponent = function(component) {
 
     wobble: function(duration) {
       var width = this._layout.width;
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: [{
           translateX: this.state.animationValue.interpolate({
             inputRange: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1],
@@ -594,7 +604,7 @@ var createAnimatableComponent = function(component) {
       if(originOrDestination) {
         style.transform = createKeyedArray(this._getBounceTransformation(direction, originOrDestination));
       }
-      this.animate(duration, style);
+      return this.animate(duration, style);
     },
 
     _getBounceTransformation: function(direction, originOrDestination) {
@@ -612,7 +622,7 @@ var createAnimatableComponent = function(component) {
     },
 
     bounceIn: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
           outputRange: [0, 1, 1],
@@ -627,7 +637,7 @@ var createAnimatableComponent = function(component) {
     },
 
     bounceOut: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.55, 1],
           outputRange: [1, 1, 0],
@@ -642,39 +652,39 @@ var createAnimatableComponent = function(component) {
     },
 
     bounceInDown: function(duration) {
-      this._bounce(duration, 'in', 'down');
+      return this._bounce(duration, 'in', 'down');
     },
 
     bounceInUp: function(duration) {
-      this._bounce(duration, 'in', 'up');
+      return this._bounce(duration, 'in', 'up');
     },
 
     bounceInLeft: function(duration) {
-      this._bounce(duration, 'in', 'left');
+      return this._bounce(duration, 'in', 'left');
     },
 
     bounceInRight: function(duration) {
-      this._bounce(duration, 'in', 'right');
+      return this._bounce(duration, 'in', 'right');
     },
 
     bounceOutDown: function(duration) {
-      this._bounce(duration, 'out', 'down');
+      return this._bounce(duration, 'out', 'down');
     },
 
     bounceOutUp: function(duration) {
-      this._bounce(duration, 'out', 'up');
+      return this._bounce(duration, 'out', 'up');
     },
 
     bounceOutLeft: function(duration) {
-      this._bounce(duration, 'out', 'left');
+      return this._bounce(duration, 'out', 'left');
     },
 
     bounceOutRight: function(duration) {
-      this._bounce(duration, 'out', 'right');
+      return this._bounce(duration, 'out', 'right');
     },
 
     flipInX: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
           outputRange: [0, 1, 1],
@@ -689,7 +699,7 @@ var createAnimatableComponent = function(component) {
     },
 
     flipInY: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
           outputRange: [0, 1, 1],
@@ -704,7 +714,7 @@ var createAnimatableComponent = function(component) {
     },
 
     flipOutX: function(duration) {
-      this.animate(duration || 750, {
+      return this.animate(duration || 750, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.3, 1],
           outputRange: [1, 1, 0],
@@ -719,7 +729,7 @@ var createAnimatableComponent = function(component) {
     },
 
     flipOutY: function(duration) {
-      this.animate(duration || 750, {
+      return this.animate(duration || 750, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.3, 1],
           outputRange: [1, 1, 0],
@@ -734,7 +744,7 @@ var createAnimatableComponent = function(component) {
     },
 
     lightSpeedIn: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
           outputRange: [0, 1, 1],
@@ -754,7 +764,7 @@ var createAnimatableComponent = function(component) {
     },
 
     lightSpeedOut: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 1],
           outputRange: [1, 0],
@@ -783,79 +793,79 @@ var createAnimatableComponent = function(component) {
       if(originOrDestination) {
         style.transform = createKeyedArray(this._getSlideTransformation(direction, originOrDestination, isBig));
       }
-      this.animate(duration, style);
+      return this.animate(duration, style);
     },
 
     fadeIn: function(duration) {
-      this._fade(duration, 'in');
+      return this._fade(duration, 'in');
     },
 
     fadeInDown: function(duration) {
-      this._fade(duration, 'in', 'down');
+      return this._fade(duration, 'in', 'down');
     },
 
     fadeInUp: function(duration) {
-      this._fade(duration, 'in', 'up');
+      return this._fade(duration, 'in', 'up');
     },
 
     fadeInLeft: function(duration) {
-      this._fade(duration, 'in', 'left');
+      return this._fade(duration, 'in', 'left');
     },
 
     fadeInRight: function(duration) {
-      this._fade(duration, 'in', 'right');
+      return this._fade(duration, 'in', 'right');
     },
 
     fadeOut: function(duration) {
-      this._fade(duration, 'out');
+      return this._fade(duration, 'out');
     },
 
     fadeOutDown: function(duration) {
-      this._fade(duration, 'out', 'down');
+      return this._fade(duration, 'out', 'down');
     },
 
     fadeOutUp: function(duration) {
-      this._fade(duration, 'out', 'up');
+      return this._fade(duration, 'out', 'up');
     },
 
     fadeOutLeft: function(duration) {
-      this._fade(duration, 'out', 'left');
+      return this._fade(duration, 'out', 'left');
     },
 
     fadeOutRight: function(duration) {
-      this._fade(duration, 'out', 'right');
+      return this._fade(duration, 'out', 'right');
     },
 
     fadeInDownBig: function(duration) {
-      this._fade(duration, 'in', 'down', true);
+      return this._fade(duration, 'in', 'down', true);
     },
 
     fadeInUpBig: function(duration) {
-      this._fade(duration, 'in', 'up', true);
+      return this._fade(duration, 'in', 'up', true);
     },
 
     fadeInLeftBig: function(duration) {
-      this._fade(duration, 'in', 'left', true);
+      return this._fade(duration, 'in', 'left', true);
     },
 
     fadeInRightBig: function(duration) {
-      this._fade(duration, 'in', 'right', true);
+      return this._fade(duration, 'in', 'right', true);
     },
 
     fadeOutDownBig: function(duration) {
-      this._fade(duration, 'out', 'down', true);
+      return this._fade(duration, 'out', 'down', true);
     },
 
     fadeOutUpBig: function(duration) {
-      this._fade(duration, 'out', 'up', true);
+      return this._fade(duration, 'out', 'up', true);
     },
 
     fadeOutLeftBig: function(duration) {
-      this._fade(duration, 'out', 'left', true);
+      return this._fade(duration, 'out', 'left', true);
     },
 
     fadeOutRightBig: function(duration) {
-      this._fade(duration, 'out', 'right', true);
+      return this._fade(duration, 'out', 'right', true);
     },
 
     _getSlideTransformation: function(direction, originOrDestination, isBig) {
@@ -872,41 +882,41 @@ var createAnimatableComponent = function(component) {
     },
 
     _slide: function(duration, direction, originOrDestination) {
-      this.animate(duration, {
+      return this.animate(duration, {
         transform: createKeyedArray(this._getSlideTransformation(direction, originOrDestination)),
       });
     },
 
     slideInDown: function(duration) {
-      this._slide(duration, 'in', 'down');
+      return this._slide(duration, 'in', 'down');
     },
 
     slideInUp: function(duration) {
-      this._slide(duration, 'in', 'up');
+      return this._slide(duration, 'in', 'up');
     },
 
     slideInLeft: function(duration) {
-      this._slide(duration, 'in', 'left');
+      return this._slide(duration, 'in', 'left');
     },
 
     slideInRight: function(duration) {
-      this._slide(duration, 'in', 'right');
+      return this._slide(duration, 'in', 'right');
     },
 
     slideOutDown: function(duration) {
-      this._slide(duration, 'out', 'down');
+      return this._slide(duration, 'out', 'down');
     },
 
     slideOutUp: function(duration) {
-      this._slide(duration, 'out', 'up');
+      return this._slide(duration, 'out', 'up');
     },
 
     slideOutLeft: function(duration) {
-      this._slide(duration, 'out', 'left');
+      return this._slide(duration, 'out', 'left');
     },
 
     slideOutRight: function(duration) {
-      this._slide(duration, 'out', 'right');
+      return this._slide(duration, 'out', 'right');
     },
 
     _zoom: function(duration, direction, originOrDestination) {
@@ -919,7 +929,7 @@ var createAnimatableComponent = function(component) {
       if(originOrDestination) {
         style.transform = createKeyedArray(this._getZoomTransformation(direction, originOrDestination));
       }
-      this.animate(duration, style);
+      return this.animate(duration, style);
     },
 
     _getZoomTransformation: function(direction, originOrDestination) {
@@ -942,7 +952,7 @@ var createAnimatableComponent = function(component) {
     },
 
     zoomIn: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.5, 1],
           outputRange: [0, 1, 1],
@@ -957,7 +967,7 @@ var createAnimatableComponent = function(component) {
     },
 
     zoomOut: function(duration) {
-      this.animate(duration, {
+      return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.5, 1],
           outputRange: [1, 1, 0],
@@ -972,35 +982,35 @@ var createAnimatableComponent = function(component) {
     },
 
     zoomInDown: function(duration) {
-      this._zoom(duration, 'in', 'down');
+      return this._zoom(duration, 'in', 'down');
     },
 
     zoomInUp: function(duration) {
-      this._zoom(duration, 'in', 'up');
+      return this._zoom(duration, 'in', 'up');
     },
 
     zoomInLeft: function(duration) {
-      this._zoom(duration, 'in', 'left');
+      return this._zoom(duration, 'in', 'left');
     },
 
     zoomInRight: function(duration) {
-      this._zoom(duration, 'in', 'right');
+      return this._zoom(duration, 'in', 'right');
     },
 
     zoomOutDown: function(duration) {
-      this._zoom(duration, 'out', 'down');
+      return this._zoom(duration, 'out', 'down');
     },
 
     zoomOutUp: function(duration) {
-      this._zoom(duration, 'out', 'up');
+      return this._zoom(duration, 'out', 'up');
     },
 
     zoomOutLeft: function(duration) {
-      this._zoom(duration, 'out', 'left');
+      return this._zoom(duration, 'out', 'left');
     },
 
     zoomOutRight: function(duration) {
-      this._zoom(duration, 'out', 'right');
+      return this._zoom(duration, 'out', 'right');
     },
 
     render: function() {

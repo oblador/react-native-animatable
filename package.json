@@ -1,6 +1,6 @@
 {
   "name": "react-native-animatable",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Easy to use declarative transitions and a standard set of animations for React Native",
   "main": "index.js",
   "scripts": {
@@ -36,6 +36,6 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "react-native": ">=0.8.0 || 0.8.0-rc || 0.8.0-rc.2 || 0.9.0-rc || 0.10.0-rc || 0.11.0-rc || 0.12.0-rc || 0.13.0-rc || 0.14.0-rc || 0.15.0-rc || 0.16.0-rc"
+    "react-native": ">=0.8.0 || 0.8.0-rc || 0.8.0-rc.2 || 0.9.0-rc || 0.10.0-rc || 0.11.0-rc || 0.12.0-rc || 0.13.0-rc || 0.14.0-rc || 0.15.0-rc || 0.16.0-rc || 0.17.0-rc"
   }
 }

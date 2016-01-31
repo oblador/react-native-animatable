@@ -60,7 +60,8 @@ You can create your own simple transitions of a style property of your own choos
 |**`easing`**|Timing function for the animation. Valid values: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`. |`ease-in-out`|
 |**`iterationCount`**|How many times to run the animation, use `infinite` for looped animations. |`1`|
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
-|**`onAnimationEnd`**|A function that is called when then animation has been completed successfully. |*None*|
+|**`onAnimationBegin`**|A function that is called when the animation has been started. |*None*|
+|**`onAnimationEnd`**|A function that is called when the animation has been completed. |*None*|
 
 ### Imperative Usage
 

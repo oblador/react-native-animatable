@@ -170,6 +170,7 @@ var createAnimatableComponent = function(component) {
   return React.createClass({
     propTypes: {
       animation:        PropTypes.string,
+      onAnimationBegin: PropTypes.func,
       onAnimationEnd:   PropTypes.func,
       transition:       PropTypes.oneOfType([
                           PropTypes.string,
@@ -191,6 +192,7 @@ var createAnimatableComponent = function(component) {
     getDefaultProps: function() {
       return {
         iterationCount: 1,
+        onAnimationBegin: function() {},
         onAnimationEnd: function() {},
       }
     },
@@ -233,11 +235,12 @@ var createAnimatableComponent = function(component) {
     },
 
     componentDidMount: function() {
-      var { animation, duration, delay, onAnimationEnd } = this.props;
+      var { animation, duration, delay, onAnimationBegin, onAnimationEnd } = this.props;
       if(animation) {
         if(delay) {
           this.setState({ scheduledAnimation: animation });
           this._timer = setTimeout(() =>{
+            onAnimationBegin();
             this.setState({ scheduledAnimation: false }, () => this[animation](duration).then(onAnimationEnd));
             this._timer = false;
           }, delay);
@@ -249,6 +252,7 @@ var createAnimatableComponent = function(component) {
             return;
           }
         };
+        onAnimationBegin();
         this[animation](duration).then(onAnimationEnd);
       }
     },
@@ -260,7 +264,7 @@ var createAnimatableComponent = function(component) {
     },
 
     componentWillReceiveProps: function(props) {
-      var { animation, duration, easing, transition, transitionValue, onAnimationEnd } = props;
+      var { animation, duration, easing, transition, transitionValue, onAnimationBegin, onAnimationEnd } = props;
 
       if(transition) {
         var transitionValues = {};
@@ -277,6 +281,7 @@ var createAnimatableComponent = function(component) {
           if(this.state.scheduledAnimation) {
             this.setState({ scheduledAnimation: animation });
           } else {
+            onAnimationBegin();
             this[animation](duration).then(onAnimationEnd);
           }
         } else {
@@ -286,7 +291,7 @@ var createAnimatableComponent = function(component) {
     },
 
     _handleLayout: function(event) {
-      var { duration, onLayout, onAnimationEnd } = this.props;
+      var { duration, onLayout, onAnimationBegin, onAnimationEnd } = this.props;
       var { scheduledAnimation } = this.state;
 
       this._layout = event.nativeEvent.layout;
@@ -295,6 +300,7 @@ var createAnimatableComponent = function(component) {
       }
 
       if(scheduledAnimation && !this._timer) {
+        onAnimationBegin();
         this.setState({ scheduledAnimation: false }, () => {
           this[scheduledAnimation](duration).then(onAnimationEnd);
         });

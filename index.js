@@ -311,13 +311,7 @@ var createAnimatableComponent = function(component) {
       return new Promise((resolve, reject) => {
         this.setState({
           animationStyle
-        }, () => this._startAnimation(duration, 0, endState => {
-          if(endState.finished) {
-            resolve();
-          } else {
-            reject();
-          }
-        }));
+        }, () => this._startAnimation(duration, 0, resolve));
       });
     },
 

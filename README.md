@@ -61,14 +61,14 @@ You can create your own simple transitions of a style property of your own choos
 |**`iterationCount`**|How many times to run the animation, use `infinite` for looped animations. |`1`|
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
 |**`onAnimationBegin`**|A function that is called when the animation has been started. |*None*|
-|**`onAnimationEnd`**|A function that is called when the animation has been completed. |*None*|
+|**`onAnimationEnd`**|A function that is called when the animation has been completed successfully or cancelled. Function is called with an `endState` argument, refer to `endState.finished` to see if the animation completed or not. |*None*|
 
 ### Imperative Usage
 
 
 #### Predefined Animations
 
-All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully and rejected when the animation is cancelled. 
+All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully or is cancelled. 
 
 ```js
 var Animatable = require('react-native-animatable');
@@ -76,7 +76,7 @@ var Animatable = require('react-native-animatable');
 React.createClass({
   render: function() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then(() => console.log('bounce finished');}>
+      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then((endState) => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled');}>
         <Animatable.View ref="view">
           <Text>Bounce me!</Text>
         </Animatable.View>

@@ -580,7 +580,7 @@ var createAnimatableComponent = function(component) {
     },
 
     wobble: function(duration) {
-      var width = this._layout.width;
+      var width = (this._layout || Dimensions.get('window')).width;
       return this.animate(duration, {
         transform: [{
           translateX: this.state.animationValue.interpolate({
@@ -746,6 +746,7 @@ var createAnimatableComponent = function(component) {
     },
 
     lightSpeedIn: function(duration) {
+      var width = (this._layout || Dimensions.get('window')).width;
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
@@ -754,7 +755,7 @@ var createAnimatableComponent = function(component) {
         transform: [{
           translateX: this.state.animationValue.interpolate({
             inputRange: [0, 0.6, 1],
-            outputRange: [this._layout.width, 0, 0],
+            outputRange: [width, 0, 0],
           }),
         }, {
           skewX: this.state.animationValue.interpolate({
@@ -766,6 +767,7 @@ var createAnimatableComponent = function(component) {
     },
 
     lightSpeedOut: function(duration) {
+      var width = (this._layout || Dimensions.get('window')).width;
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 1],
@@ -774,7 +776,7 @@ var createAnimatableComponent = function(component) {
         transform: [{
           translateX: this.state.animationValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [0, this._layout.width],
+            outputRange: [0, width],
           }),
         }, {
           skewX: this.state.animationValue.interpolate({
@@ -871,7 +873,7 @@ var createAnimatableComponent = function(component) {
     },
 
     _getSlideTransformation: function(direction, originOrDestination, isBig) {
-      var size = (isBig ? Dimensions.get('window') : this._layout);
+      var size = (isBig || !this._layout ? Dimensions.get('window') : this._layout);
       var animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
       var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
 

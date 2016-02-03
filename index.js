@@ -757,7 +757,7 @@ var createAnimatableComponent = function(component) {
             inputRange: [0, 0.6, 1],
             outputRange: [width, 0, 0],
           }),
-        }, {
+        }, {
           skewX: this.state.animationValue.interpolate({
             inputRange: [0, 0.6, 0.8, 1],
             outputRange: ['-30 deg', '20 deg', '-5 deg', '0 deg'],
@@ -778,7 +778,7 @@ var createAnimatableComponent = function(component) {
             inputRange: [0, 1],
             outputRange: [0, width],
           }),
-        }, {
+        }, {
           skewX: this.state.animationValue.interpolate({
             inputRange: [0, 1],
             outputRange: ['0 deg', '30 deg'],

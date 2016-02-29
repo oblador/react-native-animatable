@@ -198,36 +198,64 @@ var createAnimatableComponent = function(component) {
     },
 
     getInitialState: function() {
-      var transitionValues = {};
-      var styleValues = {};
-      var currentTransitionValues;
-
-      if(this.props.transition) {
-        var style = this.props.style;
-        if(this.props.transitionValue !== undefined) {
-          console.warn('transitionValue is deprecated, use regular style prop instead.');
-          var transitionStyle = {};
-          transitionStyle[this.props.transition] = this.props.transitionValue;
-          style = [style, transitionStyle];
-        }
-        var currentTransitionValues = getStyleValues(this.props.transition, style);
-        Object.keys(currentTransitionValues).forEach(key => {
-          var value = currentTransitionValues[key];
-          if(INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1) {
-            transitionValues[key] = new Animated.Value(0);
-            styleValues[key] = value;
-          } else {
-            transitionValues[key] = styleValues[key] = new Animated.Value(value);
-          }
-        })
-      }
-      return {
+      var state = {
         animationValue: new Animated.Value(getAnimationOrigin(0, this.props.direction)),
         animationStyle: {},
+        transitionStyle: {},
+        transitionValues: {},
+        currentTransitionValues: {},
+      };
+      if(this.props.transition) {
+        return {
+          ...state,
+          ...this.initializeTransitionState(this.props.transition)
+        };
+      }
+      return state;
+    },
+
+    initializeTransitionState: function(transitionKeys) {
+      var transitionValues = {};
+      var styleValues = {};
+      var style = this.props.style;
+      if(this.props.transitionValue !== undefined) {
+        console.warn('transitionValue is deprecated, use regular style prop instead.');
+        var transitionStyle = {};
+        transitionStyle[this.props.transition] = this.props.transitionValue;
+        style = [style, transitionStyle];
+      }
+
+      var currentTransitionValues = getStyleValues(transitionKeys, style);
+      Object.keys(currentTransitionValues).forEach(key => {
+        var value = currentTransitionValues[key];
+        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1) {
+          transitionValues[key] = new Animated.Value(0);
+          styleValues[key] = value;
+        } else {
+          transitionValues[key] = styleValues[key] = new Animated.Value(value);
+        }
+      });
+
+      return {
         transitionStyle: styleValues,
         transitionValues: transitionValues,
         currentTransitionValues: currentTransitionValues,
       };
+    },
+
+    getTransitionState: function(transitionKeys) {
+      if(typeof transitionKeys === 'string') {
+        transitionKeys = [transitionKeys];
+      }
+      var { transitionValues, currentTransitionValues, transitionStyle } = this.state;
+      var missingKeys = transitionKeys.filter(key => !this.state.transitionValues[key]);
+      if(missingKeys.length) {
+        var transitionState = this.initializeTransitionState(missingKeys);
+        transitionValues = { ...transitionValues, ...transitionState.transitionValues };
+        currentTransitionValues = { ...currentTransitionValues, ...transitionState.currentTransitionValues };
+        transitionStyle = { ...transitionStyle, ...transitionState.transitionStyle };
+      }
+      return { transitionValues, currentTransitionValues, transitionStyle };
     },
 
     setNativeProps: function(nativeProps) {
@@ -374,8 +402,10 @@ var createAnimatableComponent = function(component) {
         return this.transition(fromValues, toValues, arguments[3], arguments[4]);
       }
 
-      var { transitionValues, currentTransitionValues, transitionStyle } = this.state;
-      Object.keys(toValues).forEach(property => {
+      var transitionKeys = Object.keys(toValues);
+      var { transitionValues, currentTransitionValues, transitionStyle } = this.getTransitionState(transitionKeys);
+
+      transitionKeys.forEach(property => {
         var fromValue = fromValues[property];
         var toValue = toValues[property];
         var transitionValue = transitionValues[property];
@@ -420,7 +450,7 @@ var createAnimatableComponent = function(component) {
       Object.keys(toValues).forEach(property => {
         var toValue = toValues[property];
 
-        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(property) === -1 && this.state.transitionStyle[property] === this.state.transitionValues[property]) {
+        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(property) === -1 && this.state.transitionStyle[property] && this.state.transitionStyle[property] === this.state.transitionValues[property]) {
           return this._transitionToValue(this.state.transitionValues[property], toValue, duration, easing);
         }
 

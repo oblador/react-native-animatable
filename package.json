@@ -1,6 +1,6 @@
 {
   "name": "react-native-animatable",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Easy to use declarative transitions and a standard set of animations for React Native",
   "main": "index.js",
   "scripts": {

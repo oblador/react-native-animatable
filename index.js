@@ -1,16 +1,17 @@
 'use strict';
 
-var React = require('react-native');
+var React, { PropTypes } = require('react');
+var ReactNative = require('react-native');
+
 var {
   StyleSheet,
-  PropTypes,
   Animated,
   Easing,
   Dimensions,
   View,
   Text,
   Image,
-} = React;
+} = ReactNative;
 
 // Transform an object to an array the way react native wants it for transform styles
 // { a: x, b: y } => [{ a: x }, { b: y }]

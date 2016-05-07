@@ -1,9 +1,4 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
-'use strict';
+import { AppRegistry } from 'react-native';
+import ExampleView from './app';
 
-var React = require('react-native');
-
-React.AppRegistry.registerComponent('Example', () => require('./app'));
+AppRegistry.registerComponent('Example', () => ExampleView);

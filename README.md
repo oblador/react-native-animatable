@@ -10,7 +10,7 @@ Easy to use declarative transitions and a standard set of animations for React N
 To animate things you must use the `createAnimatableComponent` composer similar to the `Animated.createAnimatedComponent`. The common components `View`, `Text` and `Image` are precomposed and exposed under the `Animatable` namespace. If you have your own component that you wish to animate, simply wrap it with a `Animatable.View` or compose it with:
 
 ```js
-var Animatable = require('react-native-animatable');
+import * as Animatable from 'react-native-animatable';
 MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 ```
 
@@ -71,10 +71,10 @@ You can create your own simple transitions of a style property of your own choos
 All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully or is cancelled. 
 
 ```js
-var Animatable = require('react-native-animatable');
+import * as Animatable from 'react-native-animatable';
 
-React.createClass({
-  render: function() {
+class ExampleView extends Component {
+  render() {
     return (
       <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then((endState) => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled');}>
         <Animatable.View ref="view">
@@ -83,7 +83,7 @@ React.createClass({
       </TouchableWithoutFeedback>
     );
   }
-};
+}
 ```
 
 To stop any ongoing animations, just invoke `stopAnimation()` on that element. 
@@ -99,21 +99,17 @@ Will transition between given styles. If no `duration` or `easing` is passed a s
 This function will try to determine the current styles and pass it along to `transition()` as `fromValues`. 
 
 ```js
-// Polyfill StyleSheet.flatten if RN < 0.15
-if(!StyleSheet.flatten) {
-  StyleSheet.flatten = require('flattenStyle');
-}
-var Animatable = require('react-native-animatable');
+import * as Animatable from 'react-native-animatable';
 
-React.createClass({
-  render: function() {
+class ExampleView extends Component {
+  render() {
     return (
       <TouchableWithoutFeedback onPress={() => this.refs.text.transitionTo({opacity: 0.2});}>
         <Animatable.Text ref="text">Fade me!</Animatable.Text>
       </TouchableWithoutFeedback>
     );
   }
-};
+}
 ```
 
 ## Demo / Example

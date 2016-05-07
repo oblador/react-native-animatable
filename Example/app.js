@@ -1,28 +1,17 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- */
-'use strict';
-
-var React = require('react-native');
-var {
+import React, { Component } from 'react';
+import ReactNative, {
   StyleSheet,
-  ScrollView,
   Platform,
-  SliderIOS,
+  Slider,
   TouchableWithoutFeedback,
   PixelRatio,
-} = React;
+} from 'react-native';
 
-var { createAnimatableComponent, View, Text } = require('react-native-animatable');
-var Accordion = require('react-native-collapsible/Accordion');
-ScrollView = createAnimatableComponent(ScrollView);
+import { createAnimatableComponent, View, Text } from 'react-native-animatable';
+import Accordion from 'react-native-collapsible/Accordion';
+const ScrollView = createAnimatableComponent(ReactNative.ScrollView);
 
-if(!StyleSheet.flatten) {
-  StyleSheet.flatten = require('flattenStyle');
-}
-
-var COLORS = [
+const COLORS = [
    '#65b237', // green
    '#346ca5', // blue
    '#a0a0a0', // light grey
@@ -37,7 +26,7 @@ var COLORS = [
    '#302614', // brown
 ];
 
-var ANIMATION_TYPES = {
+const ANIMATION_TYPES = {
   'Attention Seekers': [
     'bounce',
     'flash',
@@ -123,64 +112,7 @@ var ANIMATION_TYPES = {
   ]
 };
 
-var Example = React.createClass({
-  _animatables: {},
-
-  getInitialState: function() {
-    return { duration: 1000, toggledOn: false };
-  },
-
-  render: function() {
-    var { duration, toggledOn } = this.state;
-    var durationSlider;
-    if(Platform.OS === 'ios') {
-      durationSlider = (
-        <View animation="tada" delay={3000}>
-          <SliderIOS
-            style={styles.slider}
-            value={1000}
-            onValueChange={duration => this.setState({ duration: Math.round(duration) })}
-            maximumValue={2000}
-          />
-        </View>
-      );
-    }
-    return (
-      <View animation="fadeIn" style={styles.container}>
-        <Text style={styles.welcome}>Animatable Explorer</Text>
-        {durationSlider}
-        <TouchableWithoutFeedback onPress={() => this.setState({ toggledOn: !toggledOn })}>
-          <Text style={[styles.toggle, toggledOn && styles.toggledOn]} transition={['color', 'rotate', 'fontSize']}>Toggle me!</Text>
-        </TouchableWithoutFeedback>
-        <Text animation="zoomInDown" delay={600} style={styles.instructions}>
-          Tap one of the following to animate for {duration} ms
-        </Text>
-
-        <ScrollView animation="bounceInUp" duration={800} delay={1400} style={styles.scrollView}>
-          <Accordion
-            sections={Object.keys(ANIMATION_TYPES)}
-            align="center"
-            easing="easeInOut"
-            renderHeader={section => (
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionHeaderText}>{section}</Text>
-              </View>
-            )}
-            renderContent={section => ANIMATION_TYPES[section].map((type, i) => (
-              <TouchableWithoutFeedback key={i} onPress={() => this._animatables[type][type](duration)}>
-                <View ref={component => this._animatables[type] = component} style={[{ backgroundColor: COLORS[i % COLORS.length] }, styles.animatable]}>
-                  <Text style={styles.animatableName}>{type}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            ))}
-          />
-        </ScrollView>
-      </View>
-    );
-  }
-});
-
-var styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',
@@ -241,4 +173,57 @@ var styles = StyleSheet.create({
   }
 });
 
-module.exports = Example;
+export default class ExampleView extends Component {
+  constructor(props) {
+    super(props);
+
+    this._animatables = {};
+    this.state = {
+      duration: 1000,
+      toggledOn: false
+    };
+  }
+
+  render() {
+    const { duration, toggledOn } = this.state;
+    return (
+      <View animation="fadeIn" style={styles.container}>
+        <Text style={styles.welcome}>Animatable Explorer</Text>
+        <View animation="tada" delay={3000}>
+          <Slider
+            style={styles.slider}
+            value={1000}
+            onValueChange={duration => this.setState({ duration: Math.round(duration) })}
+            maximumValue={2000}
+          />
+        </View>
+        <TouchableWithoutFeedback onPress={() => this.setState({ toggledOn: !toggledOn })}>
+          <Text style={[styles.toggle, toggledOn && styles.toggledOn]} transition={['color', 'rotate', 'fontSize']}>Toggle me!</Text>
+        </TouchableWithoutFeedback>
+        <Text animation="zoomInDown" delay={600} style={styles.instructions}>
+          Tap one of the following to animate for {duration} ms
+        </Text>
+
+        <ScrollView animation="bounceInUp" duration={800} delay={1400} style={styles.scrollView}>
+          <Accordion
+            sections={Object.keys(ANIMATION_TYPES)}
+            align="center"
+            easing="easeInOut"
+            renderHeader={section => (
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>{section}</Text>
+              </View>
+            )}
+            renderContent={section => ANIMATION_TYPES[section].map((type, i) => (
+              <TouchableWithoutFeedback key={i} onPress={() => this._animatables[type][type](duration)}>
+                <View ref={component => this._animatables[type] = component} style={[{ backgroundColor: COLORS[i % COLORS.length] }, styles.animatable]}>
+                  <Text style={styles.animatableName}>{type}</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            ))}
+          />
+        </ScrollView>
+      </View>
+    );
+  }
+}

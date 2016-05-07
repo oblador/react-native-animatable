@@ -1,49 +1,47 @@
-'use strict';
-
-var React = require('react-native');
-var {
-  StyleSheet,
+import React, {
+  Component,
   PropTypes,
+} from 'react';
+
+import ReactNative, {
   Animated,
   Easing,
   Dimensions,
-  View,
-  Text,
-  Image,
-} = React;
+  StyleSheet,
+} from 'react-native';
 
 // Transform an object to an array the way react native wants it for transform styles
 // { a: x, b: y } => [{ a: x }, { b: y }]
-var createKeyedArray = function(obj) {
-  return Object.keys(obj).map(function(key) {
-    var keyed = {};
+function createKeyedArray(obj) {
+  return Object.keys(obj).map(key => {
+    let keyed = {};
     keyed[key] = obj[key];
     return keyed;
   });
-};
+}
 
 // Helper function to calculate transform values, args:
 // direction: in|out
 // originOrDestination: up|down|left|right
 // verticalValue: amplitude for up/down animations
 // horizontalValue: amplitude for left/right animations
-var getAnimationValueForDirection = function(direction, originOrDestination, verticalValue, horizontalValue) {
-  var isVertical = originOrDestination === 'up' || originOrDestination === 'down';
-  var modifier = (isVertical && direction === 'out' ? -1 : 1) * (originOrDestination === 'down' || originOrDestination === 'left' ? -1 : 1);
+function getAnimationValueForDirection(direction, originOrDestination, verticalValue, horizontalValue) {
+  const isVertical = originOrDestination === 'up' || originOrDestination === 'down';
+  const modifier = (isVertical && direction === 'out' ? -1 : 1) * (originOrDestination === 'down' || originOrDestination === 'left' ? -1 : 1);
   return modifier * (isVertical ? verticalValue : horizontalValue);
-};
+}
 
 // Animations starting with these keywords use element dimensions
 // thus, any animation needs to be deferred until the element is measured
-var LAYOUT_DEPENDENT_ANIMATIONS = [
+const LAYOUT_DEPENDENT_ANIMATIONS = [
   'slide',
   'fade',
   'wobble',
-  'lightSpeed'
+  'lightSpeed',
 ];
 
 // These styles need to be nested in a transform array
-var TRANSFORM_STYLE_PROPERTIES = [
+const TRANSFORM_STYLE_PROPERTIES = [
   'rotate',
   'rotateX',
   'rotateY',
@@ -58,7 +56,7 @@ var TRANSFORM_STYLE_PROPERTIES = [
 ];
 
 // These styles are not number based and thus needs to be interpolated
-var INTERPOLATION_STYLE_PROPERTIES = [
+const INTERPOLATION_STYLE_PROPERTIES = [
   // Transform styles
   'rotate',
   'rotateX',
@@ -80,155 +78,145 @@ var INTERPOLATION_STYLE_PROPERTIES = [
   'textDecorationColor',
 ];
 
-var EASING_FUNCTIONS = {
-  'linear':      Easing.linear,
-  'ease':        Easing.ease,
-  'ease-in':     Easing.in(Easing.ease),
-  'ease-out':    Easing.out(Easing.ease),
+const EASING_FUNCTIONS = {
+  'linear': Easing.linear,
+  'ease': Easing.ease,
+  'ease-in': Easing.in(Easing.ease),
+  'ease-out': Easing.out(Easing.ease),
   'ease-in-out': Easing.inOut(Easing.ease),
 };
 
 // Transforms { translateX: 1 } to { transform: [{ translateX: 1 }]}
-var wrapStyleTransforms = function(style) {
-  var wrapped = {};
-  Object.keys(style).forEach(function(key) {
-    if(TRANSFORM_STYLE_PROPERTIES.indexOf(key) !== -1) {
-      if(!wrapped.transform) {
+function wrapStyleTransforms(style) {
+  let wrapped = {};
+  Object.keys(style).forEach(key => {
+    if (TRANSFORM_STYLE_PROPERTIES.indexOf(key) !== -1) {
+      if (!wrapped.transform) {
         wrapped.transform = [];
       }
-      var transform = {};
-      transform[key] = style[key];
-      wrapped.transform.push(transform);
+      wrapped.transform.push({
+        [key]: style[key],
+      });
     } else {
       wrapped[key] = style[key];
     }
   });
   return wrapped;
-};
+}
 
 // Determine to what value the animation should tween to
-var getAnimationTarget = function(iteration, direction) {
-  switch(direction) {
-    case 'reverse': return 0;
-    case 'alternate': return (iteration % 2) ? 0 : 1;
-    case 'alternate-reverse': return (iteration % 2) ? 1 : 0;
-    case 'normal':
-    default: return 1;
+function getAnimationTarget(iteration, direction) {
+  switch (direction) {
+  case 'reverse': return 0;
+  case 'alternate': return (iteration % 2) ? 0 : 1;
+  case 'alternate-reverse': return (iteration % 2) ? 1 : 0;
+  case 'normal':
+  default: return 1;
   }
-};
+}
 
 // Like getAnimationTarget but opposite
-var getAnimationOrigin = function(iteration, direction) {
+function getAnimationOrigin(iteration, direction) {
   return getAnimationTarget(iteration, direction) ? 0 : 1;
-};
+}
 
-var getDefaultStyleValue = function(key) {
-  if(key === 'backgroundColor') {
+function getDefaultStyleValue(key) {
+  if (key === 'backgroundColor') {
     return 'rgba(0,0,0,0)';
   }
-  if(key === 'color' || key.indexOf('Color') !== -1) {
+  if (key === 'color' || key.indexOf('Color') !== -1) {
     return 'rgba(0,0,0,1)';
   }
-  if(key.indexOf('rotate') !== -1 || key.indexOf('skew') !== -1) {
+  if (key.indexOf('rotate') !== -1 || key.indexOf('skew') !== -1) {
     return '0deg';
   }
-  if(key === 'fontSize') {
+  if (key === 'fontSize') {
     return 14;
   }
-  if(key === 'opacity') {
+  if (key === 'opacity') {
     return 1;
   }
   return 0;
-};
+}
 
 // Returns a flattened version of style with only `keys` values.
-var getStyleValues = function(keys, style) {
-  if(!StyleSheet.flatten) {
-    throw new Error('StyleSheet.flatten not available, upgrade React Native or polyfill with StyleSheet.flatten = require(\'flattenStyle\');')
+function getStyleValues(keys, style) {
+  if (!StyleSheet.flatten) {
+    throw new Error('StyleSheet.flatten not available, upgrade React Native or polyfill with StyleSheet.flatten = require(\'flattenStyle\');');
   }
-  var values = {};
-  var style = Object.assign({}, StyleSheet.flatten(style));
-  if(style.transform) {
-    style.transform.forEach(function(transform) {
-      var key = Object.keys(transform)[0];
-      style[key] = transform[key];
+  let values = {};
+  let flatStyle = Object.assign({}, StyleSheet.flatten(style));
+  if (flatStyle.transform) {
+    flatStyle.transform.forEach(transform => {
+      const key = Object.keys(transform)[0];
+      flatStyle[key] = transform[key];
     });
-    delete style.transform;
+    delete flatStyle.transform;
   }
-  if(typeof keys === 'string') {
-    keys = [keys];
-  }
-  keys.forEach(function(key) {
-    values[key] = (key in style ? style[key] : getDefaultStyleValue(key));
+
+  (typeof keys === 'string' ? [keys] : keys).forEach(key => {
+    values[key] = (key in flatStyle ? flatStyle[key] : getDefaultStyleValue(key));
   });
   return values;
-};
+}
 
 // Make (almost) any component animatable, similar to Animated.createAnimatedComponent
-var createAnimatableComponent = function(component) {
-  var Animatable = Animated.createAnimatedComponent(component);
-  return React.createClass({
-    propTypes: {
-      animation:        PropTypes.string,
-      onAnimationBegin: PropTypes.func,
-      onAnimationEnd:   PropTypes.func,
-      transition:       PropTypes.oneOfType([
-                          PropTypes.string,
-                          PropTypes.arrayOf(PropTypes.string),
-                        ]),
-      transitionValue:  PropTypes.any, // Deprecated
-      duration:         PropTypes.number,
-      direction:        PropTypes.oneOf(['normal', 'reverse', 'alternate', 'alternate-reverse']),
-      delay:            PropTypes.number,
-      easing:           PropTypes.oneOf(Object.keys(EASING_FUNCTIONS)),
-      iterationCount:   function(props, propName, componentName) {
-        var val = props[propName];
-        if(val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {
+export function createAnimatableComponent(component) {
+  const Animatable = Animated.createAnimatedComponent(component);
+  return class AnimatableComponent extends Component {
+    static propTypes = {
+      animation: PropTypes.string,
+      duration: PropTypes.number,
+      direction: PropTypes.oneOf(['normal', 'reverse', 'alternate', 'alternate-reverse']),
+      delay: PropTypes.number,
+      easing: PropTypes.oneOf(Object.keys(EASING_FUNCTIONS)),
+      iterationCount(props, propName, componentName) {
+        const val = props[propName];
+        if (val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {
           return new Error('iterationCount must be a positive number or "infinite"');
         }
       },
-    },
+      onAnimationBegin: PropTypes.func,
+      onAnimationEnd: PropTypes.func,
+      transition: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.arrayOf(PropTypes.string),
+      ]),
+    };
 
-    getDefaultProps: function() {
-      return {
-        iterationCount: 1,
-        onAnimationBegin: function() {},
-        onAnimationEnd: function() {},
-      }
-    },
+    static defaultProps = {
+      iterationCount: 1,
+      onAnimationBegin() {},
+      onAnimationEnd() {},
+    };
 
-    getInitialState: function() {
-      var state = {
+    constructor(props) {
+      super(props);
+
+      this.state = {
         animationValue: new Animated.Value(getAnimationOrigin(0, this.props.direction)),
         animationStyle: {},
         transitionStyle: {},
         transitionValues: {},
         currentTransitionValues: {},
       };
-      if(this.props.transition) {
-        return {
-          ...state,
-          ...this.initializeTransitionState(this.props.transition)
+
+      if (props.transition) {
+        this.state = {
+          ...this.state,
+          ...this.initializeTransitionState(props.transition),
         };
       }
-      return state;
-    },
+    }
 
-    initializeTransitionState: function(transitionKeys) {
-      var transitionValues = {};
-      var styleValues = {};
-      var style = this.props.style;
-      if(this.props.transitionValue !== undefined) {
-        console.warn('transitionValue is deprecated, use regular style prop instead.');
-        var transitionStyle = {};
-        transitionStyle[this.props.transition] = this.props.transitionValue;
-        style = [style, transitionStyle];
-      }
+    initializeTransitionState(transitionKeys) {
+      let transitionValues = {};
+      let styleValues = {};
 
-      var currentTransitionValues = getStyleValues(transitionKeys, style);
+      const currentTransitionValues = getStyleValues(transitionKeys, this.props.style);
       Object.keys(currentTransitionValues).forEach(key => {
-        var value = currentTransitionValues[key];
-        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1) {
+        const value = currentTransitionValues[key];
+        if (INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1) {
           transitionValues[key] = new Animated.Value(0);
           styleValues[key] = value;
         } else {
@@ -241,31 +229,31 @@ var createAnimatableComponent = function(component) {
         transitionValues: transitionValues,
         currentTransitionValues: currentTransitionValues,
       };
-    },
+    }
 
-    getTransitionState: function(transitionKeys) {
-      if(typeof transitionKeys === 'string') {
-        transitionKeys = [transitionKeys];
-      }
-      var { transitionValues, currentTransitionValues, transitionStyle } = this.state;
-      var missingKeys = transitionKeys.filter(key => !this.state.transitionValues[key]);
-      if(missingKeys.length) {
-        var transitionState = this.initializeTransitionState(missingKeys);
+    getTransitionState(keys) {
+      const transitionKeys = (typeof transitionKeys === 'string' ? [keys] : keys);
+      let { transitionValues, currentTransitionValues, transitionStyle } = this.state;
+      const missingKeys = transitionKeys.filter(key => !this.state.transitionValues[key]);
+      if (missingKeys.length) {
+        const transitionState = this.initializeTransitionState(missingKeys);
         transitionValues = { ...transitionValues, ...transitionState.transitionValues };
         currentTransitionValues = { ...currentTransitionValues, ...transitionState.currentTransitionValues };
         transitionStyle = { ...transitionStyle, ...transitionState.transitionStyle };
       }
       return { transitionValues, currentTransitionValues, transitionStyle };
-    },
+    }
 
-    setNativeProps: function(nativeProps) {
-      this._root.setNativeProps(nativeProps);
-    },
+    setNativeProps(nativeProps) {
+      if (this._root) {
+        this._root.setNativeProps(nativeProps);
+      }
+    }
 
-    componentDidMount: function() {
-      var { animation, duration, delay, onAnimationBegin, onAnimationEnd } = this.props;
-      if(animation) {
-        if(delay) {
+    componentDidMount() {
+      const { animation, duration, delay, onAnimationBegin, onAnimationEnd } = this.props;
+      if (animation) {
+        if (delay) {
           this.setState({ scheduledAnimation: animation });
           this._timer = setTimeout(() =>{
             onAnimationBegin();
@@ -274,39 +262,32 @@ var createAnimatableComponent = function(component) {
           }, delay);
           return;
         }
-        for (var i = LAYOUT_DEPENDENT_ANIMATIONS.length - 1; i >= 0; i--) {
-          if(animation.indexOf(LAYOUT_DEPENDENT_ANIMATIONS[i]) === 0) {
+        for (let i = LAYOUT_DEPENDENT_ANIMATIONS.length - 1; i >= 0; i--) {
+          if (animation.indexOf(LAYOUT_DEPENDENT_ANIMATIONS[i]) === 0) {
             this.setState({ scheduledAnimation: animation });
             return;
           }
-        };
+        }
         onAnimationBegin();
         this[animation](duration).then(onAnimationEnd);
       }
-    },
+    }
 
-    componentWillUnmount: function() {
-      if(this._timer) {
+    componentWillUnmount() {
+      if (this._timer) {
         clearTimeout(this._timer);
       }
-    },
+    }
 
-    componentWillReceiveProps: function(props) {
-      var { animation, duration, easing, transition, transitionValue, onAnimationBegin, onAnimationEnd } = props;
+    componentWillReceiveProps(props) {
+      const { animation, duration, easing, transition, onAnimationBegin, onAnimationEnd } = props;
 
-      if(transition) {
-        var transitionValues = {};
-        var style = props.style;
-        if(transitionValue !== undefined) {
-          var transitionStyle = {};
-          transitionStyle[transition] = transitionValue;
-          style = [style, transitionStyle];
-        }
-        var values = getStyleValues(transition, style);
+      if (transition) {
+        const values = getStyleValues(transition, props.style);
         this.transitionTo(values, duration, easing);
-      } else if(animation !== this.props.animation) {
-        if(animation) {
-          if(this.state.scheduledAnimation) {
+      } else if (animation !== this.props.animation) {
+        if (animation) {
+          if (this.state.scheduledAnimation) {
             this.setState({ scheduledAnimation: animation });
           } else {
             onAnimationBegin();
@@ -316,61 +297,61 @@ var createAnimatableComponent = function(component) {
           this.stopAnimation();
         }
       }
-    },
+    }
 
-    _handleLayout: function(event) {
-      var { duration, onLayout, onAnimationBegin, onAnimationEnd } = this.props;
-      var { scheduledAnimation } = this.state;
+    _handleLayout(event) {
+      const { duration, onLayout, onAnimationBegin, onAnimationEnd } = this.props;
+      const { scheduledAnimation } = this.state;
 
       this._layout = event.nativeEvent.layout;
-      if(onLayout) {
+      if (onLayout) {
         onLayout(event);
       }
 
-      if(scheduledAnimation && !this._timer) {
+      if (scheduledAnimation && !this._timer) {
         onAnimationBegin();
         this.setState({ scheduledAnimation: false }, () => {
           this[scheduledAnimation](duration).then(onAnimationEnd);
         });
       }
-    },
+    }
 
-    animate: function(duration, animationStyle) {
+    animate(duration, animationStyle) {
       return new Promise((resolve, reject) => {
-        this.setState({
-          animationStyle
-        }, () => this._startAnimation(duration, 0, resolve));
+        this.setState({ animationStyle }, () => {
+          this._startAnimation(duration, 0, resolve);
+        });
       });
-    },
+    }
 
-    stopAnimation: function() {
+    stopAnimation() {
       this.setState({
         scheduledAnimation: false,
         animationStyle: {},
       });
       this.state.animationValue.stopAnimation();
-      if(this._timer) {
+      if (this._timer) {
         clearTimeout(this._timer);
         this._timer = false;
       }
-    },
+    }
 
-    _startAnimation: function(duration, iteration, callback) {
-      var { animationValue } = this.state;
-      var { direction, easing, iterationCount } = this.props;
-      easing = easing || 'ease-in-out';
-      iteration = iteration || 0;
-      var fromValue = getAnimationOrigin(iteration, direction);
-      var toValue = getAnimationTarget(iteration, direction);
+    _startAnimation(duration, iteration, callback) {
+      const { animationValue } = this.state;
+      const { direction, iterationCount } = this.props;
+      let easing = this.props.easing || 'ease-in-out';
+      let currentIteration = iteration || 0;
+      const fromValue = getAnimationOrigin(currentIteration, direction);
+      const toValue = getAnimationTarget(currentIteration, direction);
       animationValue.setValue(fromValue);
 
       // This is on the way back reverse
-      if((
+      if ((
           (direction === 'reverse') ||
           (direction === 'alternate' && !toValue) ||
           (direction === 'alternate-reverse' && !toValue)
         ) && easing.match(/^ease\-(in|out)$/)) {
-        if(easing.indexOf('-in') !== -1) {
+        if (easing.indexOf('-in') !== -1) {
           easing = easing.replace('-in', '-out');
         } else {
           easing = easing.replace('-out', '-in');
@@ -380,41 +361,31 @@ var createAnimatableComponent = function(component) {
         toValue: toValue,
         easing: EASING_FUNCTIONS[easing],
         isInteraction: !iterationCount,
-        duration: duration || this.props.duration || 1000
+        duration: duration || this.props.duration || 1000,
       }).start(endState => {
-        iteration++;
-        if(endState.finished && this.props.animation && (iterationCount === 'infinite' || iteration < iterationCount)) {
-          this._startAnimation(duration, iteration, callback);
-        } else if(callback) {
+        currentIteration++;
+        if (endState.finished && this.props.animation && (iterationCount === 'infinite' || currentIteration < iterationCount)) {
+          this._startAnimation(duration, currentIteration, callback);
+        } else if (callback) {
           callback(endState);
         }
       });
-    },
+    }
 
-    transition: function(fromValues, toValues, duration, easing) {
-      // Backwards support w arguments (property, fromValue, toValue, duration, easing)
-      if(arguments.length > 4) {
-        var property = arguments[0];
-        fromValues = {};
-        toValues = {};
-        fromValues[property] = arguments[1];
-        toValues[property] = arguments[2];
-        return this.transition(fromValues, toValues, arguments[3], arguments[4]);
-      }
-
-      var transitionKeys = Object.keys(toValues);
-      var { transitionValues, currentTransitionValues, transitionStyle } = this.getTransitionState(transitionKeys);
+    transition(fromValues, toValues, duration, easing) {
+      const transitionKeys = Object.keys(toValues);
+      let { transitionValues, currentTransitionValues, transitionStyle } = this.getTransitionState(transitionKeys);
 
       transitionKeys.forEach(property => {
-        var fromValue = fromValues[property];
-        var toValue = toValues[property];
-        var transitionValue = transitionValues[property];
-        if(!transitionValue) {
+        const fromValue = fromValues[property];
+        const toValue = toValues[property];
+        let transitionValue = transitionValues[property];
+        if (!transitionValue) {
           transitionValue = new Animated.Value(0);
         }
         transitionStyle[property] = transitionValue;
 
-        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1) {
+        if (INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1) {
           transitionValue.setValue(0);
           transitionStyle[property] = transitionValue.interpolate({
             inputRange: [0, 1],
@@ -426,71 +397,63 @@ var createAnimatableComponent = function(component) {
           transitionValue.setValue(fromValue);
         }
       });
-      this.setState({ transitionValues, transitionStyle, currentTransitionValues }, function() {
+      this.setState({ transitionValues, transitionStyle, currentTransitionValues }, () => {
         this._transitionToValues(toValues, duration || this.props.duration, easing);
       });
-    },
+    }
 
-    transitionTo: function(toValues, duration, easing) {
-      // Backwards support w arguments (property, toValue, duration, easing)
-      if(arguments.length > 3) {
-        var property = arguments[0];
-        toValues = {};
-        toValues[property] = arguments[1];
-        return this.transitionTo(toValues, arguments[2], arguments[3]);
-      }
+    transitionTo(toValues, duration, easing) {
+      const { currentTransitionValues } = this.state;
 
-      var { currentTransitionValues } = this.state;
-
-      var transitions = {
+      let transitions = {
         from: {},
         to: {},
       };
 
       Object.keys(toValues).forEach(property => {
-        var toValue = toValues[property];
+        const toValue = toValues[property];
 
-        if(INTERPOLATION_STYLE_PROPERTIES.indexOf(property) === -1 && this.state.transitionStyle[property] && this.state.transitionStyle[property] === this.state.transitionValues[property]) {
+        if (INTERPOLATION_STYLE_PROPERTIES.indexOf(property) === -1 && this.state.transitionStyle[property] && this.state.transitionStyle[property] === this.state.transitionValues[property]) {
           return this._transitionToValue(this.state.transitionValues[property], toValue, duration, easing);
         }
 
-        var currentTransitionValue = currentTransitionValues[property];
-        if(typeof currentTransitionValue === 'undefined' && this.props.style) {
-          var style = getStyleValues(property, this.props.style);
+        let currentTransitionValue = currentTransitionValues[property];
+        if (typeof currentTransitionValue === 'undefined' && this.props.style) {
+          const style = getStyleValues(property, this.props.style);
           currentTransitionValue = style[property];
         }
         transitions.from[property] = currentTransitionValue;
         transitions.to[property] = toValue;
       });
 
-      if(Object.keys(transitions.from).length) {
+      if (Object.keys(transitions.from).length) {
         this.transition(transitions.from, transitions.to, duration, easing);
       }
-    },
+    }
 
-    _transitionToValues: function(toValues, duration, easing) {
+    _transitionToValues(toValues, duration, easing) {
       Object.keys(toValues).forEach(property => {
-        var transitionValue = this.state.transitionValues[property];
-        var toValue = toValues[property];
+        const transitionValue = this.state.transitionValues[property];
+        const toValue = toValues[property];
         this._transitionToValue(transitionValue, toValue, duration, easing);
       });
-    },
+    }
 
-    _transitionToValue: function(transitionValue, toValue, duration, easing) {
-      if(duration || easing) {
+    _transitionToValue(transitionValue, toValue, duration, easing) {
+      if (duration || easing) {
         Animated.timing(transitionValue, {
           toValue: toValue,
           duration: duration || 1000,
-          easing: EASING_FUNCTIONS[easing || 'ease-in-out']
+          easing: EASING_FUNCTIONS[easing || 'ease-in-out'],
         }).start();
       } else {
         Animated.spring(transitionValue, {
           toValue: toValue,
         }).start();
       }
-    },
+    }
 
-    bounce: function(duration) {
+    bounce(duration) {
       return this.animate(duration, {
         transform: [{
           translateY: this.state.animationValue.interpolate({
@@ -499,30 +462,32 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    flash: function(duration, times) {
-      var inputRange = [0];
-      var outputRange = [1];
-      times = Math.abs(times || 2) * 2;
-      for(var i = 1; i <= times; i++) {
-        inputRange.push(i/times);
+    flash(duration, times = 2) {
+      let inputRange = [0];
+      let outputRange = [1];
+      const totalTimes = times * 2;
+
+      for (let i = 1; i <= totalTimes; i++) {
+        inputRange.push(i / totalTimes);
         outputRange.push(i % 2 ? 0 : 1);
       }
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
-          inputRange, outputRange
+          inputRange,
+          outputRange,
         }),
       });
-    },
+    }
 
-    jello: function(duration, skew, times) {
-      var inputRange = [0];
-      var outputRange = ['0 deg'];
-      skew = skew || 12.5;
-      times = Math.abs(times || 4) * 2;
-      for(var i = 1; i < times; i++) {
-        inputRange.push(i/times);
+    jello(duration, skew = 12.5, times = 4) {
+      let inputRange = [0];
+      let outputRange = ['0 deg'];
+      const totalTimes = times * 2;
+
+      for (let i = 1; i < totalTimes; i++) {
+        inputRange.push(i / totalTimes);
         outputRange.push(skew / i * (i % 2 ? -1 : 1) + ' deg');
       }
       inputRange.push(1);
@@ -530,14 +495,14 @@ var createAnimatableComponent = function(component) {
 
       return this.animate(duration, {
         transform: [{
-          skewX: this.state.animationValue.interpolate({ inputRange, outputRange })
+          skewX: this.state.animationValue.interpolate({ inputRange, outputRange }),
         }, {
-          skewY: this.state.animationValue.interpolate({ inputRange, outputRange })
-        }]
+          skewY: this.state.animationValue.interpolate({ inputRange, outputRange }),
+        }],
       });
-    },
+    }
 
-    pulse: function(duration) {
+    pulse(duration) {
       return this.animate(duration, {
         transform: [{
           scale: this.state.animationValue.interpolate({
@@ -546,9 +511,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    rubberBand: function(duration) {
+    rubberBand(duration) {
       return this.animate(duration, {
         transform: [{
           scaleX: this.state.animationValue.interpolate({
@@ -562,27 +527,27 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    shake: function(duration, distance, times) {
-      var inputRange = [0];
-      var outputRange = [0];
-      distance = Math.abs(distance || 10);
-      times = Math.abs(times || 5);
-      for(var i = 1; i <= times; i++) {
-        inputRange.push(i/times);
-        outputRange.push(i === times ? 0 : (i%2 ? 1 : -1) * distance);
+    shake(duration, distance = 10, timesArg = 5) {
+      let inputRange = [0];
+      let outputRange = [0];
+
+      for (let i = 1; i <= times; i++) {
+        inputRange.push(i / times);
+        outputRange.push(i === times ? 0 : (i % 2 ? 1 : -1) * distance);
       }
       return this.animate(duration, {
         transform: [{
           translateX: this.state.animationValue.interpolate({
-            inputRange, outputRange
+            inputRange,
+            outputRange,
           }),
         }],
       });
-    },
+    }
 
-    swing: function(duration) {
+    swing(duration) {
       return this.animate(duration, {
         transform: [{
           rotateZ: this.state.animationValue.interpolate({
@@ -591,9 +556,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    tada: function(duration) {
+    tada(duration) {
       return this.animate(duration, {
         transform: [{
           scale: this.state.animationValue.interpolate({
@@ -607,15 +572,16 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    wobble: function(duration) {
-      var width = (this._layout || Dimensions.get('window')).width;
+    wobble(duration) {
+      const width = (this._layout || Dimensions.get('window')).width;
+
       return this.animate(duration, {
         transform: [{
           translateX: this.state.animationValue.interpolate({
             inputRange: [0, 0.15, 0.3, 0.45, 0.6, 0.75, 1],
-            outputRange: [0, -0.25*width, 0.2*width, -0.15*width, 0.1*width, -0.05*width, 1],
+            outputRange: [0, -0.25 * width, 0.2 * width, -0.15 * width, 0.1 * width, -0.05 * width, 1],
           }),
         }, {
           rotateZ: this.state.animationValue.interpolate({
@@ -624,36 +590,36 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    _bounce: function(duration, direction, originOrDestination) {
-      var style = {
+    _bounce(duration, direction, originOrDestination) {
+      let style = {
         opacity: this.state.animationValue.interpolate({
           inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.55, 1]),
           outputRange: (direction === 'in' ? [0, 1, 1] : [1, 1, 0]),
         }),
       };
-      if(originOrDestination) {
+      if (originOrDestination) {
         style.transform = createKeyedArray(this._getBounceTransformation(direction, originOrDestination));
       }
       return this.animate(duration, style);
-    },
+    }
 
-    _getBounceTransformation: function(direction, originOrDestination) {
-      var windowSize = Dimensions.get('window');
-      var animationValue = getAnimationValueForDirection(direction, originOrDestination, windowSize.height, windowSize.width);
-      var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
-      var modifier = animationValue > 0 ? 1 : -1;
+    _getBounceTransformation(direction, originOrDestination) {
+      const windowSize = Dimensions.get('window');
+      const animationValue = getAnimationValueForDirection(direction, originOrDestination, windowSize.height, windowSize.width);
+      const translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+      const modifier = animationValue > 0 ? 1 : -1;
 
-      var transformation = {};
-      transformation[translateKey] = this.state.animationValue.interpolate({
-        inputRange: (direction === 'in' ? [0, 0.6, 0.75, 0.9, 1] : [0, 0.2, 0.4, 0.45, 1]),
-        outputRange: (direction === 'in' ? [animationValue, 25 * modifier, -10 * modifier, 5 * modifier, 0] : [0, 10 * modifier, -20 * modifier, -20 * modifier, animationValue])
-      });
-      return transformation;
-    },
+      return {
+        [translateKey]: this.state.animationValue.interpolate({
+          inputRange: (direction === 'in' ? [0, 0.6, 0.75, 0.9, 1] : [0, 0.2, 0.4, 0.45, 1]),
+          outputRange: (direction === 'in' ? [animationValue, 25 * modifier, -10 * modifier, 5 * modifier, 0] : [0, 10 * modifier, -20 * modifier, -20 * modifier, animationValue]),
+        }),
+      };
+    }
 
-    bounceIn: function(duration) {
+    bounceIn(duration) {
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
@@ -666,9 +632,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    bounceOut: function(duration) {
+    bounceOut(duration) {
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.55, 1],
@@ -681,41 +647,41 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    bounceInDown: function(duration) {
+    bounceInDown(duration) {
       return this._bounce(duration, 'in', 'down');
-    },
+    }
 
-    bounceInUp: function(duration) {
+    bounceInUp(duration) {
       return this._bounce(duration, 'in', 'up');
-    },
+    }
 
-    bounceInLeft: function(duration) {
+    bounceInLeft(duration) {
       return this._bounce(duration, 'in', 'left');
-    },
+    }
 
-    bounceInRight: function(duration) {
+    bounceInRight(duration) {
       return this._bounce(duration, 'in', 'right');
-    },
+    }
 
-    bounceOutDown: function(duration) {
+    bounceOutDown(duration) {
       return this._bounce(duration, 'out', 'down');
-    },
+    }
 
-    bounceOutUp: function(duration) {
+    bounceOutUp(duration) {
       return this._bounce(duration, 'out', 'up');
-    },
+    }
 
-    bounceOutLeft: function(duration) {
+    bounceOutLeft(duration) {
       return this._bounce(duration, 'out', 'left');
-    },
+    }
 
-    bounceOutRight: function(duration) {
+    bounceOutRight(duration) {
       return this._bounce(duration, 'out', 'right');
-    },
+    }
 
-    flipInX: function(duration) {
+    flipInX(duration) {
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
@@ -728,9 +694,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    flipInY: function(duration) {
+    flipInY(duration) {
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
@@ -743,9 +709,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    flipOutX: function(duration) {
+    flipOutX(duration) {
       return this.animate(duration || 750, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.3, 1],
@@ -758,9 +724,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    flipOutY: function(duration) {
+    flipOutY(duration) {
       return this.animate(duration || 750, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.3, 1],
@@ -773,10 +739,10 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    lightSpeedIn: function(duration) {
-      var width = (this._layout || Dimensions.get('window')).width;
+    lightSpeedIn(duration) {
+      const width = (this._layout || Dimensions.get('window')).width;
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.6, 1],
@@ -794,10 +760,10 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    lightSpeedOut: function(duration) {
-      var width = (this._layout || Dimensions.get('window')).width;
+    lightSpeedOut(duration) {
+      const width = (this._layout || Dimensions.get('window')).width;
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 1],
@@ -815,177 +781,176 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    _fade: function(duration, direction, originOrDestination, isBig) {
-      var style = {
+    _fade(duration, direction, originOrDestination, isBig) {
+      let style = {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 1],
           outputRange: (direction === 'in' ? [0, 1] : [1, 0]),
         }),
       };
-      if(originOrDestination) {
+      if (originOrDestination) {
         style.transform = createKeyedArray(this._getSlideTransformation(direction, originOrDestination, isBig));
       }
       return this.animate(duration, style);
-    },
+    }
 
-    fadeIn: function(duration) {
+    fadeIn(duration) {
       return this._fade(duration, 'in');
-    },
+    }
 
-    fadeInDown: function(duration) {
+    fadeInDown(duration) {
       return this._fade(duration, 'in', 'down');
-    },
+    }
 
-    fadeInUp: function(duration) {
+    fadeInUp(duration) {
       return this._fade(duration, 'in', 'up');
-    },
+    }
 
-    fadeInLeft: function(duration) {
+    fadeInLeft(duration) {
       return this._fade(duration, 'in', 'left');
-    },
+    }
 
-    fadeInRight: function(duration) {
+    fadeInRight(duration) {
       return this._fade(duration, 'in', 'right');
-    },
+    }
 
-    fadeOut: function(duration) {
+    fadeOut(duration) {
       return this._fade(duration, 'out');
-    },
+    }
 
-    fadeOutDown: function(duration) {
+    fadeOutDown(duration) {
       return this._fade(duration, 'out', 'down');
-    },
+    }
 
-    fadeOutUp: function(duration) {
+    fadeOutUp(duration) {
       return this._fade(duration, 'out', 'up');
-    },
+    }
 
-    fadeOutLeft: function(duration) {
+    fadeOutLeft(duration) {
       return this._fade(duration, 'out', 'left');
-    },
+    }
 
-    fadeOutRight: function(duration) {
+    fadeOutRight(duration) {
       return this._fade(duration, 'out', 'right');
-    },
+    }
 
-    fadeInDownBig: function(duration) {
+    fadeInDownBig(duration) {
       return this._fade(duration, 'in', 'down', true);
-    },
+    }
 
-    fadeInUpBig: function(duration) {
+    fadeInUpBig(duration) {
       return this._fade(duration, 'in', 'up', true);
-    },
+    }
 
-    fadeInLeftBig: function(duration) {
+    fadeInLeftBig(duration) {
       return this._fade(duration, 'in', 'left', true);
-    },
+    }
 
-    fadeInRightBig: function(duration) {
+    fadeInRightBig(duration) {
       return this._fade(duration, 'in', 'right', true);
-    },
+    }
 
-    fadeOutDownBig: function(duration) {
+    fadeOutDownBig(duration) {
       return this._fade(duration, 'out', 'down', true);
-    },
+    }
 
-    fadeOutUpBig: function(duration) {
+    fadeOutUpBig(duration) {
       return this._fade(duration, 'out', 'up', true);
-    },
+    }
 
-    fadeOutLeftBig: function(duration) {
+    fadeOutLeftBig(duration) {
       return this._fade(duration, 'out', 'left', true);
-    },
+    }
 
-    fadeOutRightBig: function(duration) {
+    fadeOutRightBig(duration) {
       return this._fade(duration, 'out', 'right', true);
-    },
+    }
 
-    _getSlideTransformation: function(direction, originOrDestination, isBig) {
-      var size = (isBig || !this._layout ? Dimensions.get('window') : this._layout);
-      var animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
-      var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+    _getSlideTransformation(direction, originOrDestination, isBig) {
+      const size = (isBig || !this._layout ? Dimensions.get('window') : this._layout);
+      const animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
+      const translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
 
-      var transformation = {};
-      transformation[translateKey] = this.state.animationValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: (direction === 'in' ? [animationValue, 0] : [0, animationValue]),
-      });
-      return transformation;
-    },
+      return {
+        [translateKey]: this.state.animationValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: (direction === 'in' ? [animationValue, 0] : [0, animationValue]),
+        }),
+      };
+    }
 
-    _slide: function(duration, direction, originOrDestination) {
+    _slide(duration, direction, originOrDestination) {
       return this.animate(duration, {
         transform: createKeyedArray(this._getSlideTransformation(direction, originOrDestination)),
       });
-    },
+    }
 
-    slideInDown: function(duration) {
+    slideInDown(duration) {
       return this._slide(duration, 'in', 'down');
-    },
+    }
 
-    slideInUp: function(duration) {
+    slideInUp(duration) {
       return this._slide(duration, 'in', 'up');
-    },
+    }
 
-    slideInLeft: function(duration) {
+    slideInLeft(duration) {
       return this._slide(duration, 'in', 'left');
-    },
+    }
 
-    slideInRight: function(duration) {
+    slideInRight(duration) {
       return this._slide(duration, 'in', 'right');
-    },
+    }
 
-    slideOutDown: function(duration) {
+    slideOutDown(duration) {
       return this._slide(duration, 'out', 'down');
-    },
+    }
 
-    slideOutUp: function(duration) {
+    slideOutUp(duration) {
       return this._slide(duration, 'out', 'up');
-    },
+    }
 
-    slideOutLeft: function(duration) {
+    slideOutLeft(duration) {
       return this._slide(duration, 'out', 'left');
-    },
+    }
 
-    slideOutRight: function(duration) {
+    slideOutRight(duration) {
       return this._slide(duration, 'out', 'right');
-    },
+    }
 
-    _zoom: function(duration, direction, originOrDestination) {
-      var style = {
+    _zoom(duration, direction, originOrDestination) {
+      let style = {
         opacity: this.state.animationValue.interpolate({
           inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
           outputRange: (direction === 'in' ? [0, 1, 1] : [1, 1, 0]),
         }),
       };
-      if(originOrDestination) {
+      if (originOrDestination) {
         style.transform = createKeyedArray(this._getZoomTransformation(direction, originOrDestination));
       }
       return this.animate(duration, style);
-    },
+    }
 
-    _getZoomTransformation: function(direction, originOrDestination) {
-      var windowSize = Dimensions.get('window');
-      var animationValue = getAnimationValueForDirection(direction, originOrDestination, windowSize.height, windowSize.width);
-      var translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
-      var modifier = animationValue > 0 ? 1 : -1;
+    _getZoomTransformation(direction, originOrDestination) {
+      const windowSize = Dimensions.get('window');
+      const animationValue = getAnimationValueForDirection(direction, originOrDestination, windowSize.height, windowSize.width);
+      const translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+      const modifier = animationValue > 0 ? 1 : -1;
 
-      var transformation = {
+      return {
         scale: this.state.animationValue.interpolate({
           inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
-          outputRange: (direction === 'in' ? [0.1, 0.457, 1] : [1, 0.457, 0.1])
+          outputRange: (direction === 'in' ? [0.1, 0.457, 1] : [1, 0.457, 0.1]),
+        }),
+        [translateKey]: this.state.animationValue.interpolate({
+          inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
+          outputRange: (direction === 'in' ? [animationValue, -60 * modifier, 0] : [0, -60 * modifier, animationValue]),
         }),
       };
-      transformation[translateKey] = this.state.animationValue.interpolate({
-        inputRange: (direction === 'in' ? [0, 0.6, 1] : [0, 0.4, 1]),
-        outputRange: (direction === 'in' ? [animationValue, -60 * modifier, 0] : [0, -60 * modifier, animationValue])
-      });
-      return transformation;
-    },
+    }
 
-    zoomIn: function(duration) {
+    zoomIn(duration) {
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.5, 1],
@@ -998,9 +963,9 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    zoomOut: function(duration) {
+    zoomOut(duration) {
       return this.animate(duration, {
         opacity: this.state.animationValue.interpolate({
           inputRange: [0, 0.5, 1],
@@ -1013,65 +978,65 @@ var createAnimatableComponent = function(component) {
           }),
         }],
       });
-    },
+    }
 
-    zoomInDown: function(duration) {
+    zoomInDown(duration) {
       return this._zoom(duration, 'in', 'down');
-    },
+    }
 
-    zoomInUp: function(duration) {
+    zoomInUp(duration) {
       return this._zoom(duration, 'in', 'up');
-    },
+    }
 
-    zoomInLeft: function(duration) {
+    zoomInLeft(duration) {
       return this._zoom(duration, 'in', 'left');
-    },
+    }
 
-    zoomInRight: function(duration) {
+    zoomInRight(duration) {
       return this._zoom(duration, 'in', 'right');
-    },
+    }
 
-    zoomOutDown: function(duration) {
+    zoomOutDown(duration) {
       return this._zoom(duration, 'out', 'down');
-    },
+    }
 
-    zoomOutUp: function(duration) {
+    zoomOutUp(duration) {
       return this._zoom(duration, 'out', 'up');
-    },
+    }
 
-    zoomOutLeft: function(duration) {
+    zoomOutLeft(duration) {
       return this._zoom(duration, 'out', 'left');
-    },
+    }
 
-    zoomOutRight: function(duration) {
+    zoomOutRight(duration) {
       return this._zoom(duration, 'out', 'right');
-    },
+    }
 
-    render: function() {
-      var { style, children, onLayout, animation, duration, delay, transition, transitionValue, ...props } = this.props;
-      if(animation && transition) {
+    render() {
+      const { style, children, onLayout, animation, duration, delay, transition, ...props } = this.props;
+      if (animation && transition) {
         throw new Error('You cannot combine animation and transition props');
       }
-      var { scheduledAnimation } = this.state;
-      var hideStyle = (scheduledAnimation && scheduledAnimation.indexOf('In') !== -1 ? { opacity: 0 } : false)
-      return (<Animatable
-        {...props}
-        ref={(component) => this._root = component}
-        onLayout={this._handleLayout}
-        style={[
-          style,
-          this.state.animationStyle,
-          wrapStyleTransforms(this.state.transitionStyle),
-          hideStyle
-        ]}
-        >{children}</Animatable>);
-    }
-  });
-};
+      const { scheduledAnimation } = this.state;
+      const hideStyle = (scheduledAnimation && scheduledAnimation.indexOf('In') !== -1 ? { opacity: 0 } : false);
 
-module.exports = {
-  createAnimatableComponent,
-  View: createAnimatableComponent(View),
-  Text: createAnimatableComponent(Text),
-  Image: createAnimatableComponent(Image),
-};
+      return (
+        <Animatable
+          {...props}
+          ref={element => this._root = element}
+          onLayout={event => this._handleLayout(event)}
+          style={[
+            style,
+            this.state.animationStyle,
+            wrapStyleTransforms(this.state.transitionStyle),
+            hideStyle,
+          ]}
+          >{children}</Animatable>
+        );
+    }
+  };
+}
+
+export const View = createAnimatableComponent(ReactNative.View);
+export const Text = createAnimatableComponent(ReactNative.Text);
+export const Image = createAnimatableComponent(ReactNative.Image);

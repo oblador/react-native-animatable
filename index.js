@@ -170,6 +170,7 @@ export function createAnimatableComponent(component) {
       direction: PropTypes.oneOf(['normal', 'reverse', 'alternate', 'alternate-reverse']),
       delay: PropTypes.number,
       easing: PropTypes.oneOf(Object.keys(EASING_FUNCTIONS)),
+      animationValue: PropTypes.number,
       iterationCount(props, propName, componentName) {
         const val = props[propName];
         if (val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {
@@ -872,6 +873,10 @@ export function createAnimatableComponent(component) {
       const size = (isBig || !this._layout ? Dimensions.get('window') : this._layout);
       const animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
       const translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
+
+      if( this.props.animationValue ){
+        animationValue = animationValue/Math.abs(animationValue) * this.props.animationValue
+      }
 
       return {
         [translateKey]: this.state.animationValue.interpolate({

@@ -62,7 +62,7 @@ You can create your own simple transitions of a style property of your own choos
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
 |**`onAnimationBegin`**|A function that is called when the animation has been started. |*None*|
 |**`onAnimationEnd`**|A function that is called when the animation has been completed successfully or cancelled. Function is called with an `endState` argument, refer to `endState.finished` to see if the animation completed or not. |*None*|
-|**`animationValue`**|default animationValue, Maybe we need a smaller motion animation. use it |*None*|
+|**`animationValue`**|default animationValue, Maybe we need a smaller motion animation. use it |*None*| 
 
 ### Imperative Usage
 

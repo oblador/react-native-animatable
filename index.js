@@ -529,7 +529,7 @@ export function createAnimatableComponent(component) {
       });
     }
 
-    shake(duration, distance = 10, timesArg = 5) {
+    shake(duration, distance = 10, times = 5) {
       let inputRange = [0];
       let outputRange = [0];
 

@@ -513,6 +513,17 @@ export function createAnimatableComponent(component) {
       });
     }
 
+    rotate(duration) {
+      return this.animate(duration, {
+        transform: [{
+          rotate: this.state.animationValue.interpolate({
+            inputRange: [0, 0.25, 0.5, 0.75, 1],
+            outputRange: ['0 deg', '90 deg', '180 deg', '270 deg', '360 deg'],
+          }),
+        }],
+      });
+    }
+
     rubberBand(duration) {
       return this.animate(duration, {
         transform: [{

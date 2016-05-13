@@ -130,6 +130,7 @@ Animations are heavily inspired by [Animated.css](https://daneden.github.io/anim
 * `flash`
 * `jello`
 * `pulse`
+* `rotate`
 * `rubberBand`
 * `shake`
 * `swing`

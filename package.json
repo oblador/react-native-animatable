@@ -1,10 +1,10 @@
 {
   "name": "react-native-animatable",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "Easy to use declarative transitions and a standard set of animations for React Native",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "eslint index.js"
   },
   "keywords": [
     "react-native",
@@ -34,5 +34,11 @@
     "type": "git",
     "url": "git://github.com/oblador/react-native-animatable.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-eslint": "^4.1.6",
+    "eslint": "^1.10.3",
+    "eslint-plugin-react": "^3.14.0"
+  }
 }

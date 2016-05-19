@@ -262,10 +262,12 @@ export function createAnimatableComponent(component) {
           }, delay);
           return;
         }
-        for (let i = LAYOUT_DEPENDENT_ANIMATIONS.length - 1; i >= 0; i--) {
-          if (animation.indexOf(LAYOUT_DEPENDENT_ANIMATIONS[i]) === 0) {
-            this.setState({ scheduledAnimation: animation });
-            return;
+        if (!this._layout) {
+          for (let i = LAYOUT_DEPENDENT_ANIMATIONS.length - 1; i >= 0; i--) {
+            if (animation.indexOf(LAYOUT_DEPENDENT_ANIMATIONS[i]) === 0) {
+              this.setState({ scheduledAnimation: animation });
+              return;
+            }
           }
         }
         onAnimationBegin();

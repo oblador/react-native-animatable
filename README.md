@@ -24,7 +24,7 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 
 #### Looping
 
-To make looping animations simply set the `iterationCount` to `infinite`. Most animations except the attention seekers work best when setting `direction` to `alternate`. 
+To make looping animations simply set the `iterationCount` to `infinite`. Most animations except the attention seekers work best when setting `direction` to `alternate`.
 
 ```html
 <Animatable.Text animation="slideInDown" iterationCount={5} direction="alternate">Up and down you go</Animatable.Text>
@@ -35,7 +35,7 @@ To make looping animations simply set the `iterationCount` to `infinite`. Most a
 
 #### Generic transitions
 
-You can create your own simple transitions of a style property of your own choosing. The following example will increase the font size by 5 for every tap – all animated, all declarative! If you don't supply a `duration` property, a spring animation will be used. 
+You can create your own simple transitions of a style property of your own choosing. The following example will increase the font size by 5 for every tap – all animated, all declarative! If you don't supply a `duration` property, a spring animation will be used.
 
 *Note: If you are using colors, please use `rgba()` syntax.*
 
@@ -62,13 +62,14 @@ You can create your own simple transitions of a style property of your own choos
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
 |**`onAnimationBegin`**|A function that is called when the animation has been started. |*None*|
 |**`onAnimationEnd`**|A function that is called when the animation has been completed successfully or cancelled. Function is called with an `endState` argument, refer to `endState.finished` to see if the animation completed or not. |*None*|
+|**`animationValue`**|default animationValue, Maybe we need a smaller motion animation. use it |*None*| 
 
 ### Imperative Usage
 
 
 #### Predefined Animations
 
-All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully or is cancelled. 
+All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully or is cancelled.
 
 ```js
 import * as Animatable from 'react-native-animatable';
@@ -86,17 +87,17 @@ class ExampleView extends Component {
 }
 ```
 
-To stop any ongoing animations, just invoke `stopAnimation()` on that element. 
+To stop any ongoing animations, just invoke `stopAnimation()` on that element.
 
 #### Generic transitions
 
 ##### `transition(fromValues, toValues[[, duration], easing])`
 
-Will transition between given styles. If no `duration` or `easing` is passed a spring animation will be used. 
+Will transition between given styles. If no `duration` or `easing` is passed a spring animation will be used.
 
 ##### `transitionTo(toValues[[, duration], easing])`
 
-This function will try to determine the current styles and pass it along to `transition()` as `fromValues`. 
+This function will try to determine the current styles and pass it along to `transition()` as `fromValues`.
 
 ```js
 import * as Animatable from 'react-native-animatable';
@@ -114,7 +115,7 @@ class ExampleView extends Component {
 
 ## Demo / Example
 
-See `Example` folder. 
+See `Example` folder.
 
 ![animatable-demo](https://cloud.githubusercontent.com/assets/378279/10629128/3c373324-779a-11e5-8311-a3a489575b75.gif)
 

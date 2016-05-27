@@ -871,7 +871,7 @@ export function createAnimatableComponent(component) {
 
     _getSlideTransformation(direction, originOrDestination, isBig) {
       const size = (isBig || !this._layout ? Dimensions.get('window') : this._layout);
-      const animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
+      var animationValue = getAnimationValueForDirection(direction, originOrDestination, size.height, size.width);
       const translateKey = (originOrDestination === 'up' || originOrDestination === 'down' ? 'translateY' : 'translateX');
 
       if( this.props.animationValue ){

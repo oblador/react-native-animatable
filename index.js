@@ -282,15 +282,22 @@ export function createAnimatableComponent(component) {
     }
 
     componentWillReceiveProps(props) {
-      const { animation, duration, easing, transition, onAnimationBegin, onAnimationEnd } = props;
+      const { animation, duration, delay, easing, transition, onAnimationBegin, onAnimationEnd } = props;
 
       if (transition) {
         const values = getStyleValues(transition, props.style);
         this.transitionTo(values, duration, easing);
       } else if (animation !== this.props.animation) {
         if (animation) {
-          if (this.state.scheduledAnimation) {
+          if (delay) {
             this.setState({ scheduledAnimation: animation });
+
+            this._timer = setTimeout(() =>{
+              onAnimationBegin();
+              this.setState({ scheduledAnimation: false }, () => this[animation](duration).then(onAnimationEnd));
+              this._timer = false;
+            }, delay);
+
           } else {
             onAnimationBegin();
             this[animation](duration).then(onAnimationEnd);

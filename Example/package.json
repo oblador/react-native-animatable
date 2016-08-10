@@ -6,8 +6,8 @@
     "start": "node_modules/react-native/packager/packager.sh"
   },
   "dependencies": {
-    "react": "^0.14.8",
-    "react-native": "^0.25.1",
+    "react": "~15.2.1",
+    "react-native": "^0.31.0",
     "react-native-animatable": "file:../",
     "react-native-collapsible": "^0.6.0"
   }

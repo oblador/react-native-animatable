@@ -1026,7 +1026,7 @@ export function createAnimatableComponent(component) {
     }
 
     render() {
-      const { style, children, onLayout, animation, duration, delay, transition, ...props } = this.props;
+      const { style, children, onLayout, animation, duration, delay, transition, onAnimationBegin, onAnimationEnd, easing, iterationCount, direction, ...props } = this.props;
       if (animation && transition) {
         throw new Error('You cannot combine animation and transition props');
       }

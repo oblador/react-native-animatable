@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
-import ReactNative, {
-  StyleSheet,
+import React, { Component, PropTypes } from 'react';
+import {
+  ListView,
+  PixelRatio,
   Platform,
   Slider,
+  StyleSheet,
   TouchableWithoutFeedback,
-  PixelRatio,
 } from 'react-native';
 
 import { createAnimatableComponent, View, Text } from 'react-native-animatable';
-import Accordion from 'react-native-collapsible/Accordion';
-const ScrollView = createAnimatableComponent(ReactNative.ScrollView);
+const AnimatableListView = createAnimatableComponent(ListView);
 
 const COLORS = [
    '#65b237', // green
@@ -154,42 +154,87 @@ const styles = StyleSheet.create({
     }]
   },
   sectionHeader: {
-    borderTopWidth: 1 / PixelRatio.get(),
-    borderColor: '#ccc',
     backgroundColor: '#F5FCFF',
-    padding: 10,
+    padding: 15,
   },
   sectionHeaderText: {
     textAlign: 'center',
-    fontSize: 16,
+    fontSize: 18,
   },
   animatableName: {
     color: 'white',
-    fontSize: 20,
+    fontSize: 16,
     textAlign: 'center',
   },
   animatable: {
-    padding: 20,
-    margin: 10,
+    padding: 16,
+    marginBottom: 10,
+    marginHorizontal: 10,
   }
 });
+
+class AnimationCell extends Component {
+  static propTypes = {
+    animationType: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+    onPress: PropTypes.func.isRequired,
+  };
+
+  ref = null;
+  handleRef = ref => this.ref = ref;
+
+  handlePress = () => {
+    if (this.ref && this.props.onPress) {
+      this.props.onPress(this.ref, this.props.animationType);
+    }
+  };
+
+  render() {
+    return (
+      <TouchableWithoutFeedback onPress={this.handlePress}>
+        <View ref={this.handleRef} style={[{ backgroundColor: this.props.color }, styles.animatable]}>
+          <Text style={styles.animatableName}>{this.props.animationType}</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
 
 export default class ExampleView extends Component {
   constructor(props) {
     super(props);
 
-    this._animatables = {};
+    const dataSource = new ListView.DataSource({
+      rowHasChanged: (r1, r2) => r1 !== r2,
+      sectionHeaderHasChanged: (s1, s2) => s1 !== s2,
+    });
     this.state = {
+      dataSource: dataSource.cloneWithRowsAndSections(ANIMATION_TYPES),
       duration: 1000,
       toggledOn: false
     };
   }
 
+  handleRowPressed = (componentRef, animationType) => {
+    componentRef.setNativeProps({
+      style: {
+        zIndex: 1
+      }
+    });
+    componentRef[animationType](this.state.duration).then(() => {
+      componentRef.setNativeProps({
+        style: {
+          zIndex: 0
+        }
+      });
+    });
+  };
+
   render() {
-    const { duration, toggledOn } = this.state;
+    const { dataSource, duration, toggledOn } = this.state;
     return (
       <View animation="fadeIn" style={styles.container}>
-        <Text style={styles.welcome}>Animatable Explorer</Text>
+        <Text ref={ref => this.textRef = ref} style={styles.welcome}>Animatable Explorer</Text>
         <View animation="tada" delay={3000}>
           <Slider
             style={styles.slider}
@@ -204,26 +249,21 @@ export default class ExampleView extends Component {
         <Text animation="zoomInDown" delay={600} style={styles.instructions}>
           Tap one of the following to animate for {duration} ms
         </Text>
-
-        <ScrollView animation="bounceInUp" duration={800} delay={1400} style={styles.scrollView}>
-          <Accordion
-            sections={Object.keys(ANIMATION_TYPES)}
-            align="center"
-            easing="easeInOut"
-            renderHeader={section => (
-              <View style={styles.sectionHeader}>
-                <Text style={styles.sectionHeaderText}>{section}</Text>
-              </View>
-            )}
-            renderContent={section => ANIMATION_TYPES[section].map((type, i) => (
-              <TouchableWithoutFeedback key={i} onPress={() => this._animatables[type][type](duration)}>
-                <View ref={component => this._animatables[type] = component} style={[{ backgroundColor: COLORS[i % COLORS.length] }, styles.animatable]}>
-                  <Text style={styles.animatableName}>{type}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            ))}
-          />
-        </ScrollView>
+        <AnimatableListView
+          animation="bounceInUp"
+          duration={800}
+          delay={1400}
+          style={styles.listView}
+          dataSource={dataSource}
+          renderSectionHeader={(rows, section) => (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>{section}</Text>
+            </View>
+          )}
+          renderRow={(animationType, section, i) => (
+            <AnimationCell animationType={animationType} color={COLORS[i % COLORS.length]} onPress={this.handleRowPressed} />
+          )}
+        />
       </View>
     );
   }

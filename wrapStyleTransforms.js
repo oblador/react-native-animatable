@@ -1,5 +1,6 @@
 // These styles need to be nested in a transform array
 const TRANSFORM_STYLE_PROPERTIES = [
+  'perspective',
   'rotate',
   'rotateX',
   'rotateY',
@@ -7,10 +8,10 @@ const TRANSFORM_STYLE_PROPERTIES = [
   'scale',
   'scaleX',
   'scaleY',
-  'translateX',
-  'translateY',
   'skewX',
   'skewY',
+  'translateX',
+  'translateY',
 ];
 
 // Transforms { translateX: 1 } to { transform: [{ translateX: 1 }]}

@@ -33,6 +33,9 @@ export default function createAnimation(definition) {
   if (definition.easing) {
     compiled.easing = definition.easing;
   }
+  if (definition.style) {
+    compiled.style = definition.style;
+  }
 
   for (const position of positions) {
     let keyframe = definition[position];

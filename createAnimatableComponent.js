@@ -77,7 +77,9 @@ function getCompiledAnimation(animation) {
 function makeInterpolatedStyle(compiledAnimation, animationValue) {
   const style = {};
   Object.keys(compiledAnimation).forEach((key) => {
-    if (key !== 'easing') {
+    if (key === 'style') {
+      Object.assign(style, compiledAnimation.style);
+    } else if (key !== 'easing') {
       style[key] = animationValue.interpolate(compiledAnimation[key]);
     }
   });

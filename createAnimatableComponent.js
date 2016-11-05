@@ -36,6 +36,17 @@ const EASING_FUNCTIONS = {
   'ease-in-out': Easing.bezier(0.42, 0, 0.58, 1),
 };
 
+// Create a copy of `source` without `keys`
+function omit(keys, source) {
+  const filtered = {};
+  Object.keys(source).forEach((key) => {
+    if (keys.indexOf(key) === -1) {
+      filtered[key] = source[key];
+    }
+  });
+  return filtered;
+}
+
 // Determine to what value the animation should tween to
 function getAnimationTarget(iteration, direction) {
   switch (direction) {
@@ -63,14 +74,26 @@ function getCompiledAnimation(animation) {
   return createAnimation(animation);
 }
 
-function makeInterpolatedStylesFromAnimation(compiledAnimation, animationValue) {
+function makeInterpolatedStyle(compiledAnimation, animationValue) {
   const style = {};
-  for (const key in compiledAnimation) {
+  Object.keys(compiledAnimation).forEach((key) => {
     if (key !== 'easing') {
       style[key] = animationValue.interpolate(compiledAnimation[key]);
     }
-  }
+  });
   return wrapStyleTransforms(style);
+}
+
+function transitionToValue(transitionValue, toValue, duration, easing) {
+  if (duration || easing) {
+    Animated.timing(transitionValue, {
+      toValue,
+      duration: duration || 1000,
+      easing: EASING_FUNCTIONS[easing || 'ease'],
+    }).start();
+  } else {
+    Animated.spring(transitionValue, { toValue }).start();
+  }
 }
 
 // Make (almost) any component animatable, similar to Animated.createAnimatedComponent
@@ -102,7 +125,11 @@ export default function createAnimatableComponent(WrappedComponent) {
       },
       onAnimationBegin: PropTypes.func,
       onAnimationEnd: PropTypes.func,
-      style: PropTypes.any,
+      style: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.array,
+        PropTypes.object,
+      ]),
       transition: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
@@ -123,7 +150,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       let compiledAnimation = {};
       if (props.animation) {
         compiledAnimation = getCompiledAnimation(props.animation);
-        animationStyle = makeInterpolatedStylesFromAnimation(compiledAnimation, animationValue);
+        animationStyle = makeInterpolatedStyle(compiledAnimation, animationValue);
       }
       this.state = {
         animationValue,
@@ -171,9 +198,18 @@ export default function createAnimatableComponent(WrappedComponent) {
       const missingKeys = transitionKeys.filter(key => !this.state.transitionValues[key]);
       if (missingKeys.length) {
         const transitionState = this.initializeTransitionState(missingKeys);
-        transitionValues = { ...transitionValues, ...transitionState.transitionValues };
-        currentTransitionValues = { ...currentTransitionValues, ...transitionState.currentTransitionValues };
-        transitionStyle = { ...transitionStyle, ...transitionState.transitionStyle };
+        transitionValues = {
+          ...transitionValues,
+          ...transitionState.transitionValues,
+        };
+        currentTransitionValues = {
+          ...currentTransitionValues,
+          ...transitionState.currentTransitionValues,
+        };
+        transitionStyle = {
+          ...transitionStyle,
+          ...transitionState.transitionStyle,
+        };
       }
       return { transitionValues, currentTransitionValues, transitionStyle };
     }
@@ -194,7 +230,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       if (animation) {
         const startAnimation = () => {
           onAnimationBegin();
-          this._startAnimation(duration, 0, onAnimationEnd);
+          this.startAnimation(duration, 0, onAnimationEnd);
           this.delayTimer = null;
         };
         if (delay) {
@@ -233,14 +269,14 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     setAnimation(animation, callback) {
       const compiledAnimation = getCompiledAnimation(animation);
-      const animationStyle = makeInterpolatedStylesFromAnimation(compiledAnimation, this.state.animationValue);
+      const animationStyle = makeInterpolatedStyle(compiledAnimation, this.state.animationValue);
       this.setState({ animationStyle, compiledAnimation }, callback);
     }
 
     animate(animation, duration) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         this.setAnimation(animation, () => {
-          this._startAnimation(duration, 0, resolve);
+          this.startAnimation(duration, 0, resolve);
         });
       });
     }
@@ -257,7 +293,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    _startAnimation(duration, iteration, callback) {
+    startAnimation(duration, iteration, callback) {
       const { animationValue, compiledAnimation } = this.state;
       const { direction, iterationCount } = this.props;
       let easing = compiledAnimation.easing || 'ease';
@@ -284,10 +320,10 @@ export default function createAnimatableComponent(WrappedComponent) {
         easing,
         isInteraction: !iterationCount,
         duration: duration || this.props.duration || 1000,
-      }).start(endState => {
-        currentIteration++;
+      }).start((endState) => {
+        currentIteration += 1;
         if (endState.finished && this.props.animation && (iterationCount === 'infinite' || currentIteration < iterationCount)) {
-          this._startAnimation(duration, currentIteration, callback);
+          this.startAnimation(duration, currentIteration, callback);
         } else if (callback) {
           callback(endState);
         }
@@ -296,9 +332,13 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     transition(fromValues, toValues, duration, easing) {
       const transitionKeys = Object.keys(toValues);
-      let { transitionValues, currentTransitionValues, transitionStyle } = this.getTransitionState(transitionKeys);
+      const {
+        transitionValues,
+        currentTransitionValues,
+        transitionStyle,
+      } = this.getTransitionState(transitionKeys);
 
-      transitionKeys.forEach(property => {
+      transitionKeys.forEach((property) => {
         const fromValue = fromValues[property];
         const toValue = toValues[property];
         let transitionValue = transitionValues[property];
@@ -306,46 +346,48 @@ export default function createAnimatableComponent(WrappedComponent) {
           transitionValue = new Animated.Value(0);
         }
         transitionStyle[property] = transitionValue;
-
-        if (INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1) {
+        const needsInterpolation = INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1;
+        if (needsInterpolation) {
           transitionValue.setValue(0);
           transitionStyle[property] = transitionValue.interpolate({
             inputRange: [0, 1],
             outputRange: [fromValue, toValue],
           });
           currentTransitionValues[property] = toValue;
-          toValues[property] = 1;
+          toValues[property] = 1; // eslint-disable-line no-param-reassign
         } else {
           transitionValue.setValue(fromValue);
         }
       });
       this.setState({ transitionValues, transitionStyle, currentTransitionValues }, () => {
-        this._transitionToValues(toValues, duration || this.props.duration, easing);
+        this.transitionToValues(toValues, duration || this.props.duration, easing);
       });
     }
 
     transitionTo(toValues, duration, easing) {
       const { currentTransitionValues } = this.state;
 
-      let transitions = {
+      const transitions = {
         from: {},
         to: {},
       };
 
-      Object.keys(toValues).forEach(property => {
+      Object.keys(toValues).forEach((property) => {
         const toValue = toValues[property];
-
-        if (INTERPOLATION_STYLE_PROPERTIES.indexOf(property) === -1 && this.state.transitionStyle[property] && this.state.transitionStyle[property] === this.state.transitionValues[property]) {
-          return this._transitionToValue(this.state.transitionValues[property], toValue, duration, easing);
+        const needsInterpolation = INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1;
+        const transitionStyle = this.state.transitionStyle[property];
+        const transitionValue = this.state.transitionValues[property];
+        if (!needsInterpolation && transitionStyle && transitionStyle === transitionValue) {
+          transitionToValue(transitionValue, toValue, duration, easing);
+        } else {
+          let currentTransitionValue = currentTransitionValues[property];
+          if (typeof currentTransitionValue === 'undefined' && this.props.style) {
+            const style = getStyleValues(property, this.props.style);
+            currentTransitionValue = style[property];
+          }
+          transitions.from[property] = currentTransitionValue;
+          transitions.to[property] = toValue;
         }
-
-        let currentTransitionValue = currentTransitionValues[property];
-        if (typeof currentTransitionValue === 'undefined' && this.props.style) {
-          const style = getStyleValues(property, this.props.style);
-          currentTransitionValue = style[property];
-        }
-        transitions.from[property] = currentTransitionValue;
-        transitions.to[property] = toValue;
       });
 
       if (Object.keys(transitions.from).length) {
@@ -353,33 +395,20 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    _transitionToValues(toValues, duration, easing) {
-      Object.keys(toValues).forEach(property => {
+    transitionToValues(toValues, duration, easing) {
+      Object.keys(toValues).forEach((property) => {
         const transitionValue = this.state.transitionValues[property];
         const toValue = toValues[property];
-        this._transitionToValue(transitionValue, toValue, duration, easing);
+        transitionToValue(transitionValue, toValue, duration, easing);
       });
     }
 
-    _transitionToValue(transitionValue, toValue, duration, easing) {
-      if (duration || easing) {
-        Animated.timing(transitionValue, {
-          toValue: toValue,
-          duration: duration || 1000,
-          easing: EASING_FUNCTIONS[easing || 'ease'],
-        }).start();
-      } else {
-        Animated.spring(transitionValue, {
-          toValue: toValue,
-        }).start();
-      }
-    }
-
     render() {
-      const { style, animation, duration, delay, transition, onAnimationBegin, onAnimationEnd, easing, iterationCount, direction, ...restProps } = this.props;
+      const { style, animation, transition } = this.props;
       if (animation && transition) {
         throw new Error('You cannot combine animation and transition props');
       }
+      const restProps = omit(Object.keys(AnimatableComponent.propTypes), this.props);
 
       return (
         <Animatable

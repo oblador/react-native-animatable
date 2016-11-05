@@ -1,4 +1,3 @@
-import { StyleSheet } from 'react-native';
 import flattenStyle from './flattenStyle';
 import getDefaultStyleValue from './getDefaultStyleValue';
 

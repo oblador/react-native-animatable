@@ -48,7 +48,7 @@ export default function createAnimation(definition) {
     }
 
     keyframe = flattenStyle(keyframe);
-    for (const key in keyframe) {
+    Object.keys(keyframe).forEach((key) => {
       if (!(key in compiled)) {
         compiled[key] = {
           inputRange: [],
@@ -57,7 +57,7 @@ export default function createAnimation(definition) {
       }
       compiled[key].inputRange.push(position);
       compiled[key].outputRange.push(keyframe[key]);
-    }
+    });
   }
 
   return compiled;

@@ -62,6 +62,7 @@ You can create your own simple transitions of a style property of your own choos
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
 |**`onAnimationBegin`**|A function that is called when the animation has been started. |*None*|
 |**`onAnimationEnd`**|A function that is called when the animation has been completed successfully or cancelled. Function is called with an `endState` argument, refer to `endState.finished` to see if the animation completed or not. |*None*|
+|**`useNativeDriver`**|Whether to use native or JavaScript animation driver. Native driver can help with performance but cannot handle all types of styling and requires you to integrate that module on iOS.  |`false`|
 
 ### Imperative Usage
 

@@ -84,15 +84,16 @@ function makeInterpolatedStyle(compiledAnimation, animationValue) {
   return wrapStyleTransforms(style);
 }
 
-function transitionToValue(transitionValue, toValue, duration, easing) {
+function transitionToValue(transitionValue, toValue, duration, easing, useNativeDriver = false) {
   if (duration || easing) {
     Animated.timing(transitionValue, {
       toValue,
       duration: duration || 1000,
       easing: EASING_FUNCTIONS[easing || 'ease'],
+      useNativeDriver,
     }).start();
   } else {
-    Animated.spring(transitionValue, { toValue }).start();
+    Animated.spring(transitionValue, { toValue, useNativeDriver }).start();
   }
 }
 
@@ -134,12 +135,14 @@ export default function createAnimatableComponent(WrappedComponent) {
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
       ]),
+      useNativeDriver: PropTypes.bool,
     };
 
     static defaultProps = {
       iterationCount: 1,
       onAnimationBegin() {},
       onAnimationEnd() {},
+      useNativeDriver: false,
     };
 
     constructor(props) {
@@ -295,7 +298,7 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     startAnimation(duration, iteration, callback) {
       const { animationValue, compiledAnimation } = this.state;
-      const { direction, iterationCount } = this.props;
+      const { direction, iterationCount, useNativeDriver } = this.props;
       let easing = compiledAnimation.easing || 'ease';
       let currentIteration = iteration || 0;
       const fromValue = getAnimationOrigin(currentIteration, direction);
@@ -320,6 +323,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         easing,
         isInteraction: !iterationCount,
         duration: duration || this.props.duration || 1000,
+        useNativeDriver,
       }).start((endState) => {
         currentIteration += 1;
         if (endState.finished && this.props.animation && (iterationCount === 'infinite' || currentIteration < iterationCount)) {

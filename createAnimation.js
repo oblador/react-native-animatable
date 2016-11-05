@@ -21,7 +21,14 @@ function parsePosition(value) {
   return parsed;
 }
 
+const cache = {};
+
 export default function createAnimation(definition) {
+  const cacheKey = JSON.stringify(definition);
+  if (cache[cacheKey]) {
+    return cache[cacheKey];
+  }
+
   const positions = Object.keys(definition).map(parsePosition).filter(notNull);
   positions.sort(compareNumbers);
 
@@ -62,6 +69,8 @@ export default function createAnimation(definition) {
       compiled[key].outputRange.push(keyframe[key]);
     });
   }
+
+  cache[cacheKey] = compiled;
 
   return compiled;
 }

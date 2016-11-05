@@ -25,6 +25,7 @@ export default class AnimationCell extends Component {
     animationType: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
     onPress: PropTypes.func.isRequired,
+    useNativeDriver: PropTypes.bool,
   };
 
   ref = null;
@@ -44,6 +45,7 @@ export default class AnimationCell extends Component {
         <View
           ref={this.handleRef}
           style={[{ backgroundColor: this.props.color }, styles.cell]}
+          useNativeDriver={this.props.useNativeDriver}
         >
           <Text style={styles.name}>{this.props.animationType}</Text>
         </View>

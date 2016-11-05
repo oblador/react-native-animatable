@@ -114,21 +114,32 @@ const ANIMATION_TYPES = {
   ],
 };
 
+const NATIVE_INCOMPATIBLE_ANIMATIONS = [
+  'jello',
+  'swing',
+  'tada',
+  'wobble',
+  'lightSpeedIn',
+  'lightSpeedOut',
+];
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
+  title: {
+    fontSize: 28,
+    fontWeight: '300',
     textAlign: 'center',
-    margin: 10,
+    margin: 20,
     marginTop: (Platform.OS === 'ios' ? 40 : 20),
   },
   instructions: {
     textAlign: 'center',
     color: '#333333',
     marginBottom: 20,
+    backgroundColor: 'transparent',
   },
   slider: {
     height: 30,
@@ -201,13 +212,16 @@ export default class ExampleView extends Component {
         },
       });
     });
+    if (this.textRef) {
+      this.textRef[animationType](this.state.duration);
+    }
   };
 
   render() {
     const { dataSource, duration, toggledOn } = this.state;
     return (
-      <View animation="fadeIn" style={styles.container}>
-        <Text ref={this.handleTextRef} style={styles.welcome}>Animatable Explorer</Text>
+      <View animation="fadeIn" style={styles.container} useNativeDriver>
+        <Text ref={this.handleTextRef} style={styles.title}>Animatable Explorer</Text>
 
         <View animation="tada" delay={3000}>
           <Slider
@@ -221,16 +235,17 @@ export default class ExampleView extends Component {
           <Text
             style={[styles.toggle, toggledOn && styles.toggledOn]}
             transition={['color', 'rotate', 'fontSize']}
+            useNativeDriver
           >
             Toggle me!
           </Text>
         </TouchableWithoutFeedback>
-        <Text animation="zoomInDown" delay={600} style={styles.instructions}>
+        <Text animation="zoomInDown" delay={700} style={styles.instructions}>
           Tap one of the following to animate for {duration} ms
         </Text>
         <AnimatableListView
           animation="bounceInUp"
-          duration={800}
+          duration={1100}
           delay={1400}
           style={styles.listView}
           dataSource={dataSource}
@@ -245,6 +260,7 @@ export default class ExampleView extends Component {
               animationType={animationType}
               color={COLORS[i % COLORS.length]}
               onPress={this.handleRowPressed}
+              useNativeDriver={NATIVE_INCOMPATIBLE_ANIMATIONS.indexOf(animationType) === -1}
             />
           )}
         />

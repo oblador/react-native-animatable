@@ -4,7 +4,7 @@
   "description": "Easy to use declarative transitions and a standard set of animations for React Native",
   "main": "index.js",
   "scripts": {
-    "test": "eslint index.js"
+    "test": "eslint ./*.js"
   },
   "keywords": [
     "react-native",
@@ -37,8 +37,13 @@
   "license": "MIT",
   "devDependencies": {
     "babel": "^6.5.2",
-    "babel-eslint": "^4.1.6",
-    "eslint": "^1.10.3",
-    "eslint-plugin-react": "^3.14.0"
+    "babel-eslint": "^7.0.0",
+    "babel-jest": "^16.0.0",
+    "babel-preset-react-native": "^1.9.0",
+    "eslint": "^3.7.1",
+    "eslint-config-airbnb": "^12.0.0",
+    "eslint-plugin-import": "^1.16.0",
+    "eslint-plugin-jsx-a11y": "^2.2.3",
+    "eslint-plugin-react": "^6.4.1",
   }
 }

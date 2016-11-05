@@ -10,6 +10,10 @@ export function getAnimationByName(animationName) {
   return animationRegistry[animationName];
 }
 
+export function getAnimationNames() {
+  return Object.keys(animationRegistry);
+}
+
 export function initializeRegistryWithDefinitions(definitions) {
   Object.keys(definitions).forEach((animationName) => {
     registerAnimation(animationName, createAnimation(definitions[animationName]));

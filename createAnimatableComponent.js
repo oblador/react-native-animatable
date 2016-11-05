@@ -3,7 +3,7 @@ import { Animated, Easing } from 'react-native';
 import wrapStyleTransforms from './wrapStyleTransforms';
 import getStyleValues from './getStyleValues';
 import createAnimation from './createAnimation';
-import { getAnimationByName } from './registry';
+import { getAnimationByName, getAnimationNames } from './registry';
 
 // These styles are not number based and thus needs to be interpolated
 const INTERPOLATION_STYLE_PROPERTIES = [
@@ -173,6 +173,13 @@ export default function createAnimatableComponent(WrappedComponent) {
         };
       }
       this.delayTimer = null;
+
+      // Alias registered animations for backwards compatibility
+      getAnimationNames().forEach((animationName) => {
+        if (!(animationName in this)) {
+          this[animationName] = this.animate.bind(this, animationName);
+        }
+      });
     }
 
     initializeTransitionState(transitionKeys) {

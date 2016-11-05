@@ -4,6 +4,10 @@ function compareNumbers(a, b) {
   return a - b;
 }
 
+function notNull(value) {
+  return value !== null;
+}
+
 function parsePosition(value) {
   if (value === 'from') {
     return 0;
@@ -12,13 +16,13 @@ function parsePosition(value) {
   }
   const parsed = parseFloat(value, 10);
   if (isNaN(parsed) || parsed < 0 || parsed > 1) {
-    throw new Error(`Invalid animation position ${value}, should be from|to|0-1.`);
+    return null;
   }
   return parsed;
 }
 
 export default function createAnimation(definition) {
-  const positions = Object.keys(definition).map(parsePosition);
+  const positions = Object.keys(definition).map(parsePosition).filter(notNull);
   positions.sort(compareNumbers);
 
   if (positions.length < 2) {
@@ -26,6 +30,10 @@ export default function createAnimation(definition) {
   }
 
   const compiled = {};
+  if (definition.easing) {
+    compiled.easing = definition.easing;
+  }
+
   for (const position of positions) {
     let keyframe = definition[position];
     if (!keyframe) {

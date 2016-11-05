@@ -52,19 +52,23 @@ function getAnimationOrigin(iteration, direction) {
   return getAnimationTarget(iteration, direction) ? 0 : 1;
 }
 
-function makeInterpolatedStylesFromAnimation(animation, animationValue) {
-  let compiledAnimation;
+function getCompiledAnimation(animation) {
   if (typeof animation === 'string') {
-    compiledAnimation = getAnimationByName(animation);
+    const compiledAnimation = getAnimationByName(animation);
     if (!compiledAnimation) {
       throw new Error(`No animation registred by the name of ${animation}`);
     }
-  } else {
-    compiledAnimation = createAnimation(animation);
+    return compiledAnimation;
   }
+  return createAnimation(animation);
+}
+
+function makeInterpolatedStylesFromAnimation(compiledAnimation, animationValue) {
   const style = {};
   for (const key in compiledAnimation) {
-    style[key] = animationValue.interpolate(compiledAnimation[key]);
+    if (key !== 'easing') {
+      style[key] = animationValue.interpolate(compiledAnimation[key]);
+    }
   }
   return wrapStyleTransforms(style);
 }
@@ -116,12 +120,15 @@ export default function createAnimatableComponent(WrappedComponent) {
 
       const animationValue = new Animated.Value(getAnimationOrigin(0, this.props.direction));
       let animationStyle = {};
+      let compiledAnimation = {};
       if (props.animation) {
-        animationStyle = makeInterpolatedStylesFromAnimation(props.animation, animationValue);
+        compiledAnimation = getCompiledAnimation(props.animation);
+        animationStyle = makeInterpolatedStylesFromAnimation(compiledAnimation, animationValue);
       }
       this.state = {
         animationValue,
         animationStyle,
+        compiledAnimation,
         transitionStyle: {},
         transitionValues: {},
         currentTransitionValues: {},
@@ -225,8 +232,9 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     setAnimation(animation, callback) {
-      const animationStyle = makeInterpolatedStylesFromAnimation(animation, this.state.animationValue);
-      this.setState({ animationStyle }, callback);
+      const compiledAnimation = getCompiledAnimation(animation);
+      const animationStyle = makeInterpolatedStylesFromAnimation(compiledAnimation, this.state.animationValue);
+      this.setState({ animationStyle, compiledAnimation }, callback);
     }
 
     animate(animation, duration) {
@@ -250,29 +258,30 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     _startAnimation(duration, iteration, callback) {
-      const { animationValue } = this.state;
+      const { animationValue, compiledAnimation } = this.state;
       const { direction, iterationCount } = this.props;
-      let easing = this.props.easing || 'ease-in-out';
+      let easing = compiledAnimation.easing || this.props.easing || 'ease-in-out';
       let currentIteration = iteration || 0;
       const fromValue = getAnimationOrigin(currentIteration, direction);
       const toValue = getAnimationTarget(currentIteration, direction);
       animationValue.setValue(fromValue);
 
-      // This is on the way back reverse
-      if ((
-          (direction === 'reverse') ||
-          (direction === 'alternate' && !toValue) ||
-          (direction === 'alternate-reverse' && !toValue)
-        ) && easing.match(/^ease\-(in|out)$/)) {
-        if (easing.indexOf('-in') !== -1) {
-          easing = easing.replace('-in', '-out');
-        } else {
-          easing = easing.replace('-out', '-in');
-        }
+      if (typeof easing === 'string') {
+        easing = EASING_FUNCTIONS[easing];
       }
+      // Reverse easing if on the way back
+      const reversed = (
+        (direction === 'reverse') ||
+        (direction === 'alternate' && !toValue) ||
+        (direction === 'alternate-reverse' && !toValue)
+      );
+      if (reversed) {
+        easing = Easing.out(easing);
+      }
+
       Animated.timing(animationValue, {
-        toValue: toValue,
-        easing: EASING_FUNCTIONS[easing],
+        toValue,
+        easing,
         isInteraction: !iterationCount,
         duration: duration || this.props.duration || 1000,
       }).start(endState => {

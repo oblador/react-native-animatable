@@ -30,10 +30,10 @@ const INTERPOLATION_STYLE_PROPERTIES = [
 
 const EASING_FUNCTIONS = {
   linear: Easing.linear,
-  ease: Easing.ease,
-  'ease-in': Easing.in(Easing.ease),
-  'ease-out': Easing.out(Easing.ease),
-  'ease-in-out': Easing.inOut(Easing.ease),
+  ease: Easing.bezier(0.25, 0.1, 0.25, 1),
+  'ease-in': Easing.bezier(0.42, 0, 1, 1),
+  'ease-out': Easing.bezier(0, 0, 0.58, 1),
+  'ease-in-out': Easing.bezier(0.42, 0, 0.58, 1),
 };
 
 // Determine to what value the animation should tween to
@@ -260,7 +260,7 @@ export default function createAnimatableComponent(WrappedComponent) {
     _startAnimation(duration, iteration, callback) {
       const { animationValue, compiledAnimation } = this.state;
       const { direction, iterationCount } = this.props;
-      let easing = compiledAnimation.easing || this.props.easing || 'ease-in-out';
+      let easing = compiledAnimation.easing || 'ease';
       let currentIteration = iteration || 0;
       const fromValue = getAnimationOrigin(currentIteration, direction);
       const toValue = getAnimationTarget(currentIteration, direction);
@@ -366,7 +366,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         Animated.timing(transitionValue, {
           toValue: toValue,
           duration: duration || 1000,
-          easing: EASING_FUNCTIONS[easing || 'ease-in-out'],
+          easing: EASING_FUNCTIONS[easing || 'ease'],
         }).start();
       } else {
         Animated.spring(transitionValue, {

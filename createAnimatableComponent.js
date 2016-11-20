@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import { Animated, Easing } from 'react-native';
 import wrapStyleTransforms from './wrapStyleTransforms';
 import getStyleValues from './getStyleValues';
+import flattenStyle from './flattenStyle';
 import createAnimation from './createAnimation';
 import { getAnimationByName, getAnimationNames } from './registry';
 
@@ -344,7 +345,9 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     transition(fromValues, toValues, duration, easing) {
-      const transitionKeys = Object.keys(toValues);
+      const fromValuesFlat = flattenStyle(fromValues);
+      const toValuesFlat = flattenStyle(toValues);
+      const transitionKeys = Object.keys(toValuesFlat);
       const {
         transitionValues,
         currentTransitionValues,
@@ -352,8 +355,8 @@ export default function createAnimatableComponent(WrappedComponent) {
       } = this.getTransitionState(transitionKeys);
 
       transitionKeys.forEach((property) => {
-        const fromValue = fromValues[property];
-        const toValue = toValues[property];
+        const fromValue = fromValuesFlat[property];
+        const toValue = toValuesFlat[property];
         let transitionValue = transitionValues[property];
         if (!transitionValue) {
           transitionValue = new Animated.Value(0);
@@ -367,26 +370,26 @@ export default function createAnimatableComponent(WrappedComponent) {
             outputRange: [fromValue, toValue],
           });
           currentTransitionValues[property] = toValue;
-          toValues[property] = 1; // eslint-disable-line no-param-reassign
+          toValuesFlat[property] = 1;
         } else {
           transitionValue.setValue(fromValue);
         }
       });
       this.setState({ transitionValues, transitionStyle, currentTransitionValues }, () => {
-        this.transitionToValues(toValues, duration || this.props.duration, easing);
+        this.transitionToValues(toValuesFlat, duration || this.props.duration, easing);
       });
     }
 
     transitionTo(toValues, duration, easing) {
       const { currentTransitionValues } = this.state;
-
+      const toValuesFlat = flattenStyle(toValues);
       const transitions = {
         from: {},
         to: {},
       };
 
-      Object.keys(toValues).forEach((property) => {
-        const toValue = toValues[property];
+      Object.keys(toValuesFlat).forEach((property) => {
+        const toValue = toValuesFlat[property];
         const needsInterpolation = INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1;
         const transitionStyle = this.state.transitionStyle[property];
         const transitionValue = this.state.transitionValues[property];

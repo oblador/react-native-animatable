@@ -1,3 +1,7 @@
 *.log
+.babelrc
+.editorconfig
+.eslintrc
+__tests__
 node_modules
 Example

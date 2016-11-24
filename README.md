@@ -131,7 +131,8 @@ const fadeIn = {
   to: {
     opacity: 1,
   },
-};```
+};
+```
 
 Combining multiple styles to create a zoom out animation: 
 

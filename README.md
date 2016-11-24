@@ -16,7 +16,7 @@ MyCustomComponent = Animatable.createAnimatableComponent(MyCustomComponent);
 
 ### Declarative Usage
 
-#### Predefined Animations
+#### Animations
 
 ```html
 <Animatable.Text animation="zoomInUp">Zoom me up, Scotty</Animatable.Text>
@@ -57,16 +57,17 @@ You can create your own simple transitions of a style property of your own choos
 |**`duration`**|For how long the animation will run (milliseconds). |`1000`|
 |**`delay`**|Optionally delay animation (milliseconds). |`0`|
 |**`direction`**|Direction of animation, especially useful for repeating animations. Valid values: `normal`, `reverse`, `alternate`, `alternate-reverse`. |`normal`|
-|**`easing`**|Timing function for the animation. Valid values: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`. |`ease-in-out`|
+|**`easing`**|Timing function for the animation. Valid values: `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`. |`ease`|
 |**`iterationCount`**|How many times to run the animation, use `infinite` for looped animations. |`1`|
 |**`transition`**|What `style` property to transition, for example `opacity`, `rotate` or `fontSize`. Use array for multiple properties.  |*None*|
 |**`onAnimationBegin`**|A function that is called when the animation has been started. |*None*|
 |**`onAnimationEnd`**|A function that is called when the animation has been completed successfully or cancelled. Function is called with an `endState` argument, refer to `endState.finished` to see if the animation completed or not. |*None*|
+|**`useNativeDriver`**|Whether to use native or JavaScript animation driver. Native driver can help with performance but cannot handle all types of styling and requires you to integrate that module on iOS.  |`false`|
 
 ### Imperative Usage
 
 
-#### Predefined Animations
+#### Animations
 
 All animations are exposed as functions on Animatable elements, they take an optional `duration` argument. They return a promise that is resolved when animation completes successfully or is cancelled. 
 
@@ -110,6 +111,56 @@ class ExampleView extends Component {
     );
   }
 }
+```
+
+## Custom Animations
+
+Animations can be referred to by a global name or a definition object. 
+
+### Animation Definition Schema
+
+An animation definition is a plain object that contains an optional `easing` property, an optional `style` property for static non-animated styles (useful for `perspective`, `backfaceVisibility`, `zIndex` etc) and a list of keyframes. The keyframes are refered to by a number between 0 to 1 or `from` and `to`. Inspect the source in the `definitions` folder to see more in depth examples. 
+
+A simple fade in animation: 
+
+```js
+const fadeIn = {
+  from: {
+    opacity: 0,
+  },
+  to: {
+    opacity: 1,
+  },
+};```
+
+Combining multiple styles to create a zoom out animation: 
+
+```js
+const zoomOut = {
+  0: {
+    opacity: 1,
+    scale: 1,
+  },
+  0.5: {
+    opacity: 1,
+    scale: 0.3,
+  },
+  1: {
+    opacity: 0,
+    scale: 0,
+  },
+};
+```
+
+To make your animations globally available by referring to them by a name, you can register them with `initializeRegistryWithDefinitions`. This function can also be used to replace built in animations in case you want to tweak some value. 
+
+```js
+Animatable.initializeRegistryWithDefinitions({
+  myFancyAnimation: {
+    from: { ... },
+    to: { ... },
+  }
+});
 ```
 
 ## Demo / Example

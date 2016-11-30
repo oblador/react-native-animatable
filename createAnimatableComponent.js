@@ -92,7 +92,7 @@ function transitionToValue(transitionValue, toValue, duration, easing, useNative
     Animated.timing(transitionValue, {
       toValue,
       duration: duration || 1000,
-      easing: EASING_FUNCTIONS[easing || 'ease'],
+      easing: typeof easing === 'function' ? easing : EASING_FUNCTIONS[easing || 'ease'],
       useNativeDriver,
     }).start();
   } else {
@@ -119,7 +119,10 @@ export default function createAnimatableComponent(WrappedComponent) {
       duration: PropTypes.number,
       direction: PropTypes.oneOf(['normal', 'reverse', 'alternate', 'alternate-reverse']),
       delay: PropTypes.number,
-      easing: PropTypes.oneOf(Object.keys(EASING_FUNCTIONS)),
+      easing: PropTypes.oneOfType([
+        PropTypes.oneOf(Object.keys(EASING_FUNCTIONS)),
+        PropTypes.func,
+      ]),
       iterationCount(props, propName) {
         const val = props[propName];
         if (val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {

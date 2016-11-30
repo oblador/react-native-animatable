@@ -5,6 +5,7 @@ import getStyleValues from './getStyleValues';
 import flattenStyle from './flattenStyle';
 import createAnimation from './createAnimation';
 import { getAnimationByName, getAnimationNames } from './registry';
+import EASING_FUNCTIONS from './easing';
 
 // These styles are not number based and thus needs to be interpolated
 const INTERPOLATION_STYLE_PROPERTIES = [
@@ -28,14 +29,6 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'color',
   'textDecorationColor',
 ];
-
-const EASING_FUNCTIONS = {
-  linear: Easing.linear,
-  ease: Easing.bezier(0.25, 0.1, 0.25, 1),
-  'ease-in': Easing.bezier(0.42, 0, 1, 1),
-  'ease-out': Easing.bezier(0, 0, 0.58, 1),
-  'ease-in-out': Easing.bezier(0.42, 0, 0.58, 1),
-};
 
 // Create a copy of `source` without `keys`
 function omit(keys, source) {

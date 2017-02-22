@@ -8,6 +8,9 @@ export default function getDefaultStyleValue(key) {
   if (key.indexOf('rotate') !== -1 || key.indexOf('skew') !== -1) {
     return '0deg';
   }
+  if (key.indexOf('scale') !== -1) {
+    return 1;
+  }
   if (key === 'fontSize') {
     return 14;
   }

@@ -28,6 +28,8 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   // Text styles
   'color',
   'textDecorationColor',
+  // Image styles
+  'tintColor',
 ];
 
 // Create a copy of `source` without `keys`

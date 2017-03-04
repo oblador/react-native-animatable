@@ -390,7 +390,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         const transitionStyle = this.state.transitionStyle[property];
         const transitionValue = this.state.transitionValues[property];
         if (!needsInterpolation && transitionStyle && transitionStyle === transitionValue) {
-          transitionToValue(transitionValue, toValue, duration, easing);
+          transitionToValue(transitionValue, toValue, duration, easing, this.props.useNativeDriver);
         } else {
           let currentTransitionValue = currentTransitionValues[property];
           if (typeof currentTransitionValue === 'undefined' && this.props.style) {
@@ -411,7 +411,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       Object.keys(toValues).forEach((property) => {
         const transitionValue = this.state.transitionValues[property];
         const toValue = toValues[property];
-        transitionToValue(transitionValue, toValue, duration, easing);
+        transitionToValue(transitionValue, toValue, duration, easing, this.props.useNativeDriver);
       });
     }
 

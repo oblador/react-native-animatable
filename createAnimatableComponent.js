@@ -374,7 +374,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         }
       });
       this.setState({ transitionValues, transitionStyle, currentTransitionValues }, () => {
-        this.transitionToValues(toValuesFlat, duration || this.props.duration, easing);
+        this.transitionToValues(toValuesFlat, duration || this.props.duration, easing, this.props.delay);
       });
     }
 
@@ -409,7 +409,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    transitionToValues(toValues, duration, easing) {
+    transitionToValues(toValues, duration, easing, delay) {
       Object.keys(toValues).forEach((property) => {
         const transitionValue = this.state.transitionValues[property];
         const toValue = toValues[property];

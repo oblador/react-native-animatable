@@ -329,7 +329,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       Animated.timing(animationValue, {
         toValue,
         easing,
-        isInteraction: !iterationCount,
+        isInteraction: iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
       }).start((endState) => {

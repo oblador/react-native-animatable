@@ -88,7 +88,7 @@ function makeInterpolatedStyle(compiledAnimation, animationValue) {
 }
 
 function transitionToValue(transitionValue, toValue, duration, easing, useNativeDriver = false, delay) {
-  if (duration || easing) {
+  if (duration || easing || delay) {
     Animated.timing(transitionValue, {
       toValue,
       delay: delay,

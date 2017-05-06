@@ -28,6 +28,8 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   // Text styles
   'color',
   'textDecorationColor',
+  // Image styles
+  'tintColor',
 ];
 
 // Create a copy of `source` without `keys`
@@ -39,6 +41,11 @@ function omit(keys, source) {
     }
   });
   return filtered;
+}
+
+// Yes it's absurd, but actually fast
+function deepEquals(a, b) {
+  return a === b || JSON.stringify(a) === JSON.stringify(b);
 }
 
 // Determine to what value the animation should tween to
@@ -258,7 +265,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       if (transition) {
         const values = getStyleValues(transition, props.style);
         this.transitionTo(values, duration, easing, delay);
-      } else if (animation !== this.props.animation) {
+      } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {
           if (this.delayTimer) {
             this.setAnimation(animation);
@@ -329,7 +336,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       Animated.timing(animationValue, {
         toValue,
         easing,
-        isInteraction: !iterationCount,
+        isInteraction: iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
       }).start((endState) => {

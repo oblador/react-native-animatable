@@ -14,4 +14,7 @@ export const View = createComponent(CoreView);
 export const Text = createComponent(CoreText);
 export const Image = createComponent(CoreImage);
 export { default as createAnimation } from './createAnimation';
-export { registerAnimation, initializeRegistryWithDefinitions } from './registry';
+export {
+  registerAnimation,
+  initializeRegistryWithDefinitions,
+} from './registry';

@@ -1,7 +1,6 @@
 import { Easing } from 'react-native';
 
 const EASING_FUNCTIONS = {
-
   // Standard CSS easings
 
   linear: Easing.linear,

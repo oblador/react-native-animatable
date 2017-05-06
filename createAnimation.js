@@ -58,7 +58,7 @@ export default function createAnimation(definition) {
     }
 
     keyframe = flattenStyle(keyframe);
-    Object.keys(keyframe).forEach((key) => {
+    Object.keys(keyframe).forEach(key => {
       if (!(key in compiled)) {
         compiled[key] = {
           inputRange: [],

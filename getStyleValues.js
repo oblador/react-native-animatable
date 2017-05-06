@@ -6,8 +6,10 @@ export default function getStyleValues(keys, style) {
   const values = {};
   const flatStyle = flattenStyle(style);
 
-  (typeof keys === 'string' ? [keys] : keys).forEach((key) => {
-    values[key] = (key in flatStyle ? flatStyle[key] : getDefaultStyleValue(key, flatStyle));
+  (typeof keys === 'string' ? [keys] : keys).forEach(key => {
+    values[key] = key in flatStyle
+      ? flatStyle[key]
+      : getDefaultStyleValue(key, flatStyle);
   });
   return values;
 }

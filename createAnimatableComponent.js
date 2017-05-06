@@ -102,7 +102,7 @@ function transitionToValue(
   if (duration || easing || delay) {
     Animated.timing(transitionValue, {
       toValue,
-      delay: delay,
+      delay,
       duration: duration || 1000,
       easing: typeof easing === 'function'
         ? easing

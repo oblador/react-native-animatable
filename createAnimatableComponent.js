@@ -43,6 +43,11 @@ function omit(keys, source) {
   return filtered;
 }
 
+// Yes it's absurd, but actually fast
+function deepEquals(a, b) {
+  return a === b || JSON.stringify(a) === JSON.stringify(b);
+}
+
 // Determine to what value the animation should tween to
 function getAnimationTarget(iteration, direction) {
   switch (direction) {
@@ -258,7 +263,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       if (transition) {
         const values = getStyleValues(transition, props.style);
         this.transitionTo(values, duration, easing);
-      } else if (animation !== this.props.animation) {
+      } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {
           if (this.delayTimer) {
             this.setAnimation(animation);

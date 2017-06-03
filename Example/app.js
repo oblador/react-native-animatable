@@ -116,9 +116,6 @@ const ANIMATION_TYPES = {
 
 const NATIVE_INCOMPATIBLE_ANIMATIONS = [
   'jello',
-  'swing',
-  'tada',
-  'wobble',
   'lightSpeedIn',
   'lightSpeedOut',
 ];
@@ -235,7 +232,6 @@ export default class ExampleView extends Component {
           <Text
             style={[styles.toggle, toggledOn && styles.toggledOn]}
             transition={['color', 'rotate', 'fontSize']}
-            useNativeDriver
           >
             Toggle me!
           </Text>

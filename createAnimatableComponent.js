@@ -97,7 +97,7 @@ function transitionToValue(
   duration,
   easing,
   useNativeDriver = false,
-  delay
+  delay,
 ) {
   if (duration || easing || delay) {
     Animated.timing(transitionValue, {
@@ -142,7 +142,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         const val = props[propName];
         if (val !== 'infinite' && !(typeof val === 'number' && val >= 1)) {
           return new Error(
-            'iterationCount must be a positive number or "infinite"'
+            'iterationCount must be a positive number or "infinite"',
           );
         }
         return null;
@@ -162,10 +162,16 @@ export default function createAnimatableComponent(WrappedComponent) {
     };
 
     static defaultProps = {
+      animation: undefined,
       delay: 0,
+      direction: 'normal',
+      duration: undefined,
+      easing: undefined,
       iterationCount: 1,
       onAnimationBegin() {},
       onAnimationEnd() {},
+      style: undefined,
+      transition: undefined,
       useNativeDriver: false,
     };
 
@@ -173,7 +179,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       super(props);
 
       const animationValue = new Animated.Value(
-        getAnimationOrigin(0, this.props.direction)
+        getAnimationOrigin(0, this.props.direction),
       );
       let animationStyle = {};
       let compiledAnimation = {};
@@ -181,7 +187,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         compiledAnimation = getCompiledAnimation(props.animation);
         animationStyle = makeInterpolatedStyle(
           compiledAnimation,
-          animationValue
+          animationValue,
         );
       }
       this.state = {
@@ -215,7 +221,7 @@ export default function createAnimatableComponent(WrappedComponent) {
 
       const currentTransitionValues = getStyleValues(
         transitionKeys,
-        this.props.style
+        this.props.style,
       );
       Object.keys(currentTransitionValues).forEach(key => {
         const value = currentTransitionValues[key];
@@ -223,7 +229,9 @@ export default function createAnimatableComponent(WrappedComponent) {
           transitionValues[key] = new Animated.Value(0);
           styleValues[key] = value;
         } else {
-          transitionValues[key] = styleValues[key] = new Animated.Value(value);
+          const animationValue = new Animated.Value(value);
+          transitionValues[key] = animationValue;
+          styleValues[key] = animationValue;
         }
       });
 
@@ -242,7 +250,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         transitionStyle,
       } = this.state;
       const missingKeys = transitionKeys.filter(
-        key => !this.state.transitionValues[key]
+        key => !this.state.transitionValues[key],
       );
       if (missingKeys.length) {
         const transitionState = this.initializeTransitionState(missingKeys);
@@ -333,7 +341,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       const compiledAnimation = getCompiledAnimation(animation);
       const animationStyle = makeInterpolatedStyle(
         compiledAnimation,
-        this.state.animationValue
+        this.state.animationValue,
       );
       this.setState({ animationStyle, compiledAnimation }, callback);
     }
@@ -438,9 +446,9 @@ export default function createAnimatableComponent(WrappedComponent) {
             toValuesFlat,
             duration || this.props.duration,
             easing,
-            this.props.delay
+            this.props.delay,
           );
-        }
+        },
       );
     }
 
@@ -469,7 +477,7 @@ export default function createAnimatableComponent(WrappedComponent) {
             duration,
             easing,
             this.props.useNativeDriver,
-            delay
+            delay,
           );
         } else {
           let currentTransitionValue = currentTransitionValues[property];
@@ -500,7 +508,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           duration,
           easing,
           this.props.useNativeDriver,
-          delay
+          delay,
         );
       });
     }
@@ -512,7 +520,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
       const restProps = omit(
         Object.keys(AnimatableComponent.propTypes),
-        this.props
+        this.props,
       );
 
       return (

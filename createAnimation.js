@@ -44,7 +44,8 @@ export default function createAnimation(definition) {
     compiled.style = definition.style;
   }
 
-  for (const position of positions) {
+  for (let i = 0; i < positions.length; i += 1) {
+    const position = positions[i];
     let keyframe = definition[position];
     if (!keyframe) {
       if (position === 0) {

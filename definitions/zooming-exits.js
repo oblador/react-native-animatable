@@ -3,7 +3,7 @@ import { Easing } from 'react-native';
 function makeZoomOutTranslation(translationType, pivotPoint) {
   const modifier = Math.min(1, Math.max(-1, pivotPoint));
   return {
-    easing: Easing.bezier(0.175, 0.885, 0.320, 1),
+    easing: Easing.bezier(0.175, 0.885, 0.32, 1),
     0: {
       opacity: 1,
       scale: 1,

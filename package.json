@@ -8,7 +8,7 @@
     "jest:watch": "npm run jest -- --watch",
     "lint": "./node_modules/.bin/eslint ./*.js",
     "test": "npm run lint && npm run jest",
-    "format": "./node_modules/.bin/prettier --single-quote --trailing-comma es5 --write {,definitions/,__tests__}*.js"
+    "format": "./node_modules/.bin/prettier --single-quote --trailing-comma all --write {,definitions/,__tests__}*.js"
   },
   "keywords": [
     "react-native",
@@ -42,27 +42,25 @@
   "jest": {
     "preset": "jest-react-native",
     "modulePathIgnorePatterns": [
-      "<rootDir>/Example/",
-      "<rootDir>/node_modules/react-native/Libraries/react-native/",
-      "<rootDir>/node_modules/react-native/packager/"
+      "<rootDir>/Example/"
     ]
   },
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-eslint": "^7.0.0",
-    "babel-jest": "^16.0.0",
+    "babel-jest": "^20.0.3",
     "babel-preset-react-native": "^1.9.0",
     "eslint": "^3.7.1",
-    "eslint-config-airbnb": "^12.0.0",
-    "eslint-plugin-import": "^1.16.0",
-    "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.4.1",
-    "jest": "17.0.2",
-    "jest-cli": "17.0.2",
-    "jest-react-native": "17.0.3",
+    "eslint-config-airbnb": "^15.0.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-jsx-a11y": "^5.0.3",
+    "eslint-plugin-react": "^7.0.1",
+    "jest": "20.0.4",
+    "jest-cli": "20.0.4",
+    "jest-react-native": "18.0.0",
     "prettier": "^1.3.1",
-    "react": "~15.3.2",
-    "react-native": "^0.36.1",
-    "react-test-renderer": "15.3.2"
+    "react": "*",
+    "react-native": "*",
+    "react-test-renderer": "15.5.4"
   }
 }

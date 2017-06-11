@@ -32,6 +32,8 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'tintColor',
 ];
 
+const ZERO_CLAMPED_STYLE_PROPERTIES = ['width', 'height'];
+
 // Create a copy of `source` without `keys`
 function omit(keys, source) {
   const filtered = {};
@@ -424,9 +426,10 @@ export default function createAnimatableComponent(WrappedComponent) {
         if (!transitionValue) {
           transitionValue = new Animated.Value(0);
         }
-        transitionStyle[property] = transitionValue;
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1;
+        const needsZeroClamping =
+          ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         if (needsInterpolation) {
           transitionValue.setValue(0);
           transitionStyle[property] = transitionValue.interpolate({
@@ -436,6 +439,16 @@ export default function createAnimatableComponent(WrappedComponent) {
           currentTransitionValues[property] = toValue;
           toValuesFlat[property] = 1;
         } else {
+          if (needsZeroClamping) {
+            transitionStyle[property] = transitionValue.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 1],
+              extrapolateLeft: 'clamp',
+            });
+            currentTransitionValues[property] = toValue;
+          } else {
+            transitionStyle[property] = transitionValue;
+          }
           transitionValue.setValue(fromValue);
         }
       });
@@ -464,10 +477,13 @@ export default function createAnimatableComponent(WrappedComponent) {
         const toValue = toValuesFlat[property];
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1;
+        const needsZeroClamping =
+          ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         const transitionStyle = this.state.transitionStyle[property];
         const transitionValue = this.state.transitionValues[property];
         if (
           !needsInterpolation &&
+          !needsZeroClamping &&
           transitionStyle &&
           transitionStyle === transitionValue
         ) {

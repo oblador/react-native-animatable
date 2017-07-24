@@ -62,5 +62,8 @@
     "react": "*",
     "react-native": "*",
     "react-test-renderer": "15.5.4"
+  },
+  "dependencies": {
+    "prop-types": "^15.5.10"
   }
 }

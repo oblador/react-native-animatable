@@ -15,7 +15,7 @@ import {
 
 type EasingFunction ={(t: number) :number};
 type Easing =
-    'inear' |
+    'linear' |
     'ease' |
     'ease-in' |
     'ease-out' |
@@ -138,13 +138,13 @@ interface AnimatableComponent<P extends {}, S extends {}> extends
         toValues: T,
         duration?: number,
         easing?: Easing
-    );
+    ): void;
 
     transitionTo<T extends S>(
         toValues: T,
         duration?: number,
         easing?: Easing
-    );
+    ): void;
 }
 
 interface CustomAnimation<T = TextStyle & ViewStyle & ImageStyle> {

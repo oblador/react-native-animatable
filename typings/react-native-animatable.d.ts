@@ -114,7 +114,7 @@ interface AnimatableProperties<S extends {}> {
     animation?: Animation | string;
     duration?: number;
     delay?: number;
-    directin?: 'normal' | 'reverse' | 'alternate'| 'alternate-reverse';
+    direction?: 'normal' | 'reverse' | 'alternate'| 'alternate-reverse';
     easing?: Easing;
     iterationCount?: number | 'infinite';
     transition?: keyof S | keyof S[];

@@ -15,7 +15,7 @@ import {
 
 type EasingFunction ={(t: number) :number};
 type Easing =
-    'inear' |
+    'linear' |
     'ease' |
     'ease-in' |
     'ease-out' |
@@ -114,7 +114,7 @@ interface AnimatableProperties<S extends {}> {
     animation?: Animation | string;
     duration?: number;
     delay?: number;
-    directin?: 'normal' | 'reverse' | 'alternate'| 'alternate-reverse';
+    direction?: 'normal' | 'reverse' | 'alternate'| 'alternate-reverse';
     easing?: Easing;
     iterationCount?: number | 'infinite';
     transition?: keyof S | keyof S[];
@@ -138,13 +138,13 @@ interface AnimatableComponent<P extends {}, S extends {}> extends
         toValues: T,
         duration?: number,
         easing?: Easing
-    );
+    ): void;
 
     transitionTo<T extends S>(
         toValues: T,
         duration?: number,
         easing?: Easing
-    );
+    ): void;
 }
 
 interface CustomAnimation<T = TextStyle & ViewStyle & ImageStyle> {

@@ -77,7 +77,7 @@ import * as Animatable from 'react-native-animatable';
 class ExampleView extends Component {
   render() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then((endState) => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled');}>
+      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then((endState) => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));}>
         <Animatable.View ref="view">
           <Text>Bounce me!</Text>
         </Animatable.View>

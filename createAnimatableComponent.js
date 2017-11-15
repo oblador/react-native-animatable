@@ -294,8 +294,9 @@ export default function createAnimatableComponent(WrappedComponent) {
       } = this.props;
       if (animation) {
         const startAnimation = () => {
+          const {onAnimationEnd: newOnAnimationEnd = onAnimationEnd} = this.state
           onAnimationBegin();
-          this.startAnimation(duration, 0, onAnimationEnd);
+          this.startAnimation(duration, 0, newOnAnimationEnd);
           this.delayTimer = null;
         };
         if (delay) {
@@ -324,6 +325,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         if (animation) {
           if (this.delayTimer) {
             this.setAnimation(animation);
+            this.setOnAnimationEnd(onAnimationEnd);
           } else {
             onAnimationBegin();
             this.animate(animation, duration).then(onAnimationEnd);
@@ -347,6 +349,10 @@ export default function createAnimatableComponent(WrappedComponent) {
         this.state.animationValue,
       );
       this.setState({ animationStyle, compiledAnimation }, callback);
+    }
+
+    setOnAnimationEnd(onAnimationEnd) {
+      this.setState({ onAnimationEnd });
     }
 
     animate(animation, duration) {

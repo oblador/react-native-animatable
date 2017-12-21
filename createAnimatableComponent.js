@@ -291,11 +291,12 @@ export default function createAnimatableComponent(WrappedComponent) {
         delay,
         onAnimationBegin,
         onAnimationEnd,
+        iterationPause,
       } = this.props;
       if (animation) {
         const startAnimation = () => {
           onAnimationBegin();
-          this.startAnimation(duration, 0, onAnimationEnd);
+          this.startAnimation(duration, 0, iterationPause, onAnimationEnd);
           this.delayTimer = null;
         };
         if (delay) {
@@ -349,10 +350,10 @@ export default function createAnimatableComponent(WrappedComponent) {
       this.setState({ animationStyle, compiledAnimation }, callback);
     }
 
-    animate(animation, duration) {
+    animate(animation, duration, iterationCount) {
       return new Promise(resolve => {
         this.setAnimation(animation, () => {
-          this.startAnimation(duration, 0, resolve);
+          this.startAnimation(duration, 0, iterationCount, resolve);
         });
       });
     }
@@ -369,7 +370,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    startAnimation(duration, iteration, callback) {
+    startAnimation(duration, iteration, iterationPause, callback) {
       const { animationValue, compiledAnimation } = this.state;
       const { direction, iterationCount, useNativeDriver } = this.props;
       let easing = this.props.easing || compiledAnimation.easing || 'ease';
@@ -389,21 +390,24 @@ export default function createAnimatableComponent(WrappedComponent) {
       if (reversed) {
         easing = Easing.out(easing);
       }
-
-      Animated.timing(animationValue, {
+      const delay = iterationPause ? { delay: iterationPause } : {}
+      const config = {
         toValue,
         easing,
         isInteraction: iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
-      }).start(endState => {
+        ...delay,
+      }
+
+      Animated.timing(animationValue, config).start(endState => {
         currentIteration += 1;
         if (
           endState.finished &&
           this.props.animation &&
           (iterationCount === 'infinite' || currentIteration < iterationCount)
         ) {
-          this.startAnimation(duration, currentIteration, callback);
+          this.startAnimation(duration, currentIteration, iterationPause, callback);
         } else if (callback) {
           callback(endState);
         }

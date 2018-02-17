@@ -170,6 +170,12 @@ Animatable.initializeRegistryWithDefinitions({
 });
 ```
 
+## React Europe Talk
+
+[![18922912_1935104760082516_4717918248927023870_o](https://user-images.githubusercontent.com/378279/36341201-fd11e80c-13ea-11e8-8585-ab1d0c5ae27d.jpg)](https://www.youtube.com/watch?v=3SITFIGz4xo)
+
+The talk "_A Novel Approach to Declarative Animations in React Native_" from React Europe 2017 about animations and transitions in general and some examples using this library [is available on YouTube](https://www.youtube.com/watch?v=3SITFIGz4xo).
+
 ## Demo / Example
 
 See `Examples/AnimatableExplorer` folder. 

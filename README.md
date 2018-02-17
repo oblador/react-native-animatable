@@ -1,5 +1,5 @@
 # react-native-animatable
-Easy to use declarative transitions and a standard set of animations for React Native
+Declarative transitions and animations for React Native
 
 ## Installation
 
@@ -174,13 +174,20 @@ Animatable.initializeRegistryWithDefinitions({
 
 [![18922912_1935104760082516_4717918248927023870_o](https://user-images.githubusercontent.com/378279/36341201-fd11e80c-13ea-11e8-8585-ab1d0c5ae27d.jpg)](https://www.youtube.com/watch?v=3SITFIGz4xo)
 
-The talk "_A Novel Approach to Declarative Animations in React Native_" from React Europe 2017 about animations and transitions in general and some examples using this library [is available on YouTube](https://www.youtube.com/watch?v=3SITFIGz4xo).
+The talk __*A Novel Approach to Declarative Animations in React Native*__ from React Europe 2017 about this library and animations/transitions in general is [available on YouTube](https://www.youtube.com/watch?v=3SITFIGz4xo).
 
-## Demo / Example
+## `MakeItRain` example
 
-See `Examples/AnimatableExplorer` folder. 
+See [`Examples/MakeItRain`](https://github.com/oblador/react-native-animatable/tree/master/Examples/MakeItRain) folder for the example project from the talk. 
 
-![Animatable Explorer](https://user-images.githubusercontent.com/378279/36341096-406b8c86-13e9-11e8-8b75-3fd969f7d3d1.gif)
+[![MakeItRain Example](https://user-images.githubusercontent.com/378279/36341976-06326ad6-13f7-11e8-8fe1-ab947bbea5c8.gif)](https://github.com/oblador/react-native-animatable/tree/master/Examples/MakeItRain)
+
+
+## `AnimatableExplorer` example
+
+See [`Examples/AnimatableExplorer`](https://github.com/oblador/react-native-animatable/tree/master/Examples/AnimatableExplorer) folder for an example project demoing animations available out of the box and more. 
+
+![Animatable Explorer](https://user-images.githubusercontent.com/378279/36341974-f697e5d8-13f6-11e8-8e2a-21d8c2a4b340.gif)
 
 ## Animations
 

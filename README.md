@@ -172,9 +172,9 @@ Animatable.initializeRegistryWithDefinitions({
 
 ## Demo / Example
 
-See `Example` folder. 
+See `Examples/AnimatableExplorer` folder. 
 
-![animatable-demo](https://cloud.githubusercontent.com/assets/378279/10629128/3c373324-779a-11e5-8311-a3a489575b75.gif)
+![Animatable Explorer](https://user-images.githubusercontent.com/378279/36341096-406b8c86-13e9-11e8-8b75-3fd969f7d3d1.gif)
 
 ## Animations
 

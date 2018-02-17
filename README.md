@@ -75,10 +75,14 @@ All animations are exposed as functions on Animatable elements, they take an opt
 import * as Animatable from 'react-native-animatable';
 
 class ExampleView extends Component {
+  handleViewRef = ref => this.view = ref;
+  
+  bounce = () => this.view.bounce(800).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
+  
   render() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then((endState) => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));}>
-        <Animatable.View ref="view">
+      <TouchableWithoutFeedback onPress={this.bounce}>
+        <Animatable.View ref={this.handleViewRef}>
           <Text>Bounce me!</Text>
         </Animatable.View>
       </TouchableWithoutFeedback>
@@ -103,10 +107,12 @@ This function will try to determine the current styles and pass it along to `tra
 import * as Animatable from 'react-native-animatable';
 
 class ExampleView extends Component {
+  handleTextRef = ref => this.text = ref;
+  
   render() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.text.transitionTo({opacity: 0.2});}>
-        <Animatable.Text ref="text">Fade me!</Animatable.Text>
+      <TouchableWithoutFeedback onPress={() => this.text.transitionTo({ opacity: 0.2 })}>
+        <Animatable.Text ref={this.handleTextRef}>Fade me!</Animatable.Text>
       </TouchableWithoutFeedback>
     );
   }

@@ -1,4 +1,4 @@
-import { 
+import {
     NativeMethodsMixin,
     ViewProperties,
     TextProperties,
@@ -121,6 +121,8 @@ interface AnimatableProperties<S extends {}> {
     useNativeDriver?: boolean;
     onAnimationBegin?: Function;
     onAnimationEnd?: Function;
+    onTransitionBegin?: (property: string) => void;
+    onTransitionEnd?: (property: string) => void;
 }
 
 type AnimatableAnimationMethods =
@@ -179,4 +181,3 @@ export const Text : AnimatableComponent<TextProperties, TextStyle>;
 export type Text = AnimatableComponent<TextProperties, TextStyle>;
 export const Image : AnimatableComponent<ImageProperties, ImageStyle>;
 export type Image = AnimatableComponent<ImageProperties, ImageStyle>;
-

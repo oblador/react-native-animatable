@@ -105,7 +105,6 @@ function transitionToValue(
   onTransitionBegin,
   onTransitionEnd,
 ) {
-  onTransitionBegin(property);
   const animation = (duration || easing || delay) ?
     Animated.timing(transitionValue, {
       toValue,
@@ -117,6 +116,7 @@ function transitionToValue(
       useNativeDriver,
     }) :
     Animated.spring(transitionValue, { toValue, useNativeDriver });
+  setTimeout(() => onTransitionBegin(property), delay);
   animation.start(() => onTransitionEnd(property));
 }
 

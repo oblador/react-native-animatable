@@ -117,7 +117,7 @@ interface AnimatableProperties<S extends {}> {
     direction?: 'normal' | 'reverse' | 'alternate'| 'alternate-reverse';
     easing?: Easing;
     iterationCount?: number | 'infinite';
-    iterationPause?: number;
+    iterationDelay?: number;
     transition?: keyof S | keyof S[];
     useNativeDriver?: boolean;
     onAnimationBegin?: Function;

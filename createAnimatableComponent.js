@@ -291,12 +291,12 @@ export default function createAnimatableComponent(WrappedComponent) {
         delay,
         onAnimationBegin,
         onAnimationEnd,
-        iterationPause,
+        iterationDelay,
       } = this.props;
       if (animation) {
         const startAnimation = () => {
           onAnimationBegin();
-          this.startAnimation(duration, 0, iterationPause, onAnimationEnd);
+          this.startAnimation(duration, 0, iterationDelay, onAnimationEnd);
           this.delayTimer = null;
         };
         if (delay) {
@@ -350,10 +350,10 @@ export default function createAnimatableComponent(WrappedComponent) {
       this.setState({ animationStyle, compiledAnimation }, callback);
     }
 
-    animate(animation, duration, iterationCount) {
+    animate(animation, duration, iterationDelay) {
       return new Promise(resolve => {
         this.setAnimation(animation, () => {
-          this.startAnimation(duration, 0, iterationCount, resolve);
+          this.startAnimation(duration, 0, iterationDelay, resolve);
         });
       });
     }
@@ -370,7 +370,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    startAnimation(duration, iteration, iterationPause, callback) {
+    startAnimation(duration, iteration, iterationDelay, callback) {
       const { animationValue, compiledAnimation } = this.state;
       const { direction, iterationCount, useNativeDriver } = this.props;
       let easing = this.props.easing || compiledAnimation.easing || 'ease';
@@ -390,14 +390,13 @@ export default function createAnimatableComponent(WrappedComponent) {
       if (reversed) {
         easing = Easing.out(easing);
       }
-      const delay = iterationPause ? { delay: iterationPause } : {}
       const config = {
         toValue,
         easing,
         isInteraction: iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
-        ...delay,
+        delay: iterationDelay || 0,
       }
 
       Animated.timing(animationValue, config).start(endState => {
@@ -407,7 +406,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           this.props.animation &&
           (iterationCount === 'infinite' || currentIteration < iterationCount)
         ) {
-          this.startAnimation(duration, currentIteration, iterationPause, callback);
+          this.startAnimation(duration, currentIteration, iterationDelay, callback);
         } else if (callback) {
           callback(endState);
         }

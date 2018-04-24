@@ -503,8 +503,8 @@ export default function createAnimatableComponent(WrappedComponent) {
             easing,
             this.props.useNativeDriver,
             delay,
-            this.props.onTransitionBegin,
-            this.props.onTransitionEnd,
+            prop => this.props.onTransitionBegin(prop),
+            prop => this.props.onTransitionEnd(prop),
           );
         } else {
           let currentTransitionValue = currentTransitionValues[property];
@@ -537,8 +537,8 @@ export default function createAnimatableComponent(WrappedComponent) {
           easing,
           this.props.useNativeDriver,
           delay,
-          this.props.onTransitionBegin,
-          this.props.onTransitionEnd,
+          prop => this.props.onTransitionBegin(prop),
+          prop => this.props.onTransitionEnd(prop),
         );
       });
     }

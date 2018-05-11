@@ -291,17 +291,22 @@ export default function createAnimatableComponent(WrappedComponent) {
         delay,
         onAnimationBegin,
         onAnimationEnd,
+        noAnimateOnMount,
       } = this.props;
       if (animation) {
-        const startAnimation = () => {
-          onAnimationBegin();
-          this.startAnimation(duration, 0, onAnimationEnd);
-          this.delayTimer = null;
-        };
-        if (delay) {
-          this.delayTimer = setTimeout(startAnimation, delay);
+        if (noAnimateOnMount) {
+          this.startAnimation(0, 0);
         } else {
-          startAnimation();
+          const startAnimation = () => {
+            onAnimationBegin();
+            this.startAnimation(duration, 0, onAnimationEnd);
+            this.delayTimer = null;
+          };
+          if (delay) {
+            this.delayTimer = setTimeout(startAnimation, delay);
+          } else {
+            startAnimation();
+          }
         }
       }
     }
@@ -390,11 +395,18 @@ export default function createAnimatableComponent(WrappedComponent) {
         easing = Easing.out(easing);
       }
 
+      let effectiveDuration = 1000;
+      if (typeof duration === 'number') {
+        effectiveDuration = duration;
+      } else if (typeof this.props.duration === 'number') {
+        effectiveDuration = this.props.duration;
+      }
+
       Animated.timing(animationValue, {
         toValue,
         easing,
         isInteraction: iterationCount <= 1,
-        duration: duration || this.props.duration || 1000,
+        duration: effectiveDuration,
         useNativeDriver,
       }).start(endState => {
         currentIteration += 1;

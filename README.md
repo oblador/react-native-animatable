@@ -1,5 +1,5 @@
 # react-native-animatable
-Easy to use declarative transitions and a standard set of animations for React Native
+Declarative transitions and animations for React Native
 
 ## Installation
 
@@ -75,10 +75,14 @@ All animations are exposed as functions on Animatable elements, they take an opt
 import * as Animatable from 'react-native-animatable';
 
 class ExampleView extends Component {
+  handleViewRef = ref => this.view = ref;
+  
+  bounce = () => this.view.bounce(800).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
+  
   render() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.view.bounce(800).then((endState) => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));}>
-        <Animatable.View ref="view">
+      <TouchableWithoutFeedback onPress={this.bounce}>
+        <Animatable.View ref={this.handleViewRef}>
           <Text>Bounce me!</Text>
         </Animatable.View>
       </TouchableWithoutFeedback>
@@ -103,10 +107,12 @@ This function will try to determine the current styles and pass it along to `tra
 import * as Animatable from 'react-native-animatable';
 
 class ExampleView extends Component {
+  handleTextRef = ref => this.text = ref;
+  
   render() {
     return (
-      <TouchableWithoutFeedback onPress={() => this.refs.text.transitionTo({opacity: 0.2});}>
-        <Animatable.Text ref="text">Fade me!</Animatable.Text>
+      <TouchableWithoutFeedback onPress={() => this.text.transitionTo({ opacity: 0.2 })}>
+        <Animatable.Text ref={this.handleTextRef}>Fade me!</Animatable.Text>
       </TouchableWithoutFeedback>
     );
   }
@@ -164,11 +170,24 @@ Animatable.initializeRegistryWithDefinitions({
 });
 ```
 
-## Demo / Example
+## React Europe Talk
 
-See `Example` folder. 
+[![18922912_1935104760082516_4717918248927023870_o](https://user-images.githubusercontent.com/378279/36341201-fd11e80c-13ea-11e8-8585-ab1d0c5ae27d.jpg)](https://www.youtube.com/watch?v=3SITFIGz4xo)
 
-![animatable-demo](https://cloud.githubusercontent.com/assets/378279/10629128/3c373324-779a-11e5-8311-a3a489575b75.gif)
+The talk __*A Novel Approach to Declarative Animations in React Native*__ from React Europe 2017 about this library and animations/transitions in general is [available on YouTube](https://www.youtube.com/watch?v=3SITFIGz4xo).
+
+## `MakeItRain` example
+
+See [`Examples/MakeItRain`](https://github.com/oblador/react-native-animatable/tree/master/Examples/MakeItRain) folder for the example project from the talk. 
+
+[![MakeItRain Example](https://user-images.githubusercontent.com/378279/36341976-06326ad6-13f7-11e8-8fe1-ab947bbea5c8.gif)](https://github.com/oblador/react-native-animatable/tree/master/Examples/MakeItRain)
+
+
+## `AnimatableExplorer` example
+
+See [`Examples/AnimatableExplorer`](https://github.com/oblador/react-native-animatable/tree/master/Examples/AnimatableExplorer) folder for an example project demoing animations available out of the box and more. 
+
+![Animatable Explorer](https://user-images.githubusercontent.com/378279/36341974-f697e5d8-13f6-11e8-8e2a-21d8c2a4b340.gif)
 
 ## Animations
 

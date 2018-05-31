@@ -1,5 +1,20 @@
 language: node_js
 node_js:
-  - "6"
+- stable
+cache:
+  yarn: true
+  directories:
+  - node_modules
+install:
+- yarn
 script:
-  - npm test
+- yarn test
+deploy:
+  provider: npm
+  email: joel@oblador.se
+  api_key:
+    secure: "HDRoMPEc30cezQkg/CdWpXlQTzF4bXW5J2Cftc8CwywMt+9CH/eQWZJcK7U80j7NSrh2Yus3xVD2d4vA8MCpZySjE8bosx7GxfArAj8CEVTAUSSy4tCn5woTJmC3FU/Iexq/MQTcjwhRhCGGwyfKYJlqZGeXkao0G7Hn5n8fAflcTXfibDUsI4pSu6hj70Cgo9RrWJ3ktTZ7eOKX8Iu4PxWJRkrpTVRswwlJTrO5UTh/eyD2GB6/qVGbOOm/ZiAta7L2e/27gbowgLW0Ic3/pypQ62Q+EPjCVlfqLSxS2o6lUutqy+sl0xHacNHR7ShfcZdeUDAZ2r5OqOc+iJsccc+tEgVxH6CVTAU3l+57ynKuOyDIOn0ySHMh0Pcj1FzRwAvOfkXmvEvBxrqNNR8KZWfUi2e9J8X1EYmM5rZlolxRHwyz8I6k098/JpaJERxnkXZ3uTVlwQnOc3ANGTzrdN/yQzLocY+6DuSshSUCAAno9zg9KStDkmTz+H7jw2TB+Opjskv65sd9k10xqoCWEltLNpvvTI8M9xnQjgb1X+T8NqIaui7cE/dpFBlRoueota5CouhedUhKbcgCxHutFt5NEdwBDhDAHn5mH/KBLmRvZA2/iV11kGjh5ZdhDKMEAfwiT4fi5Xns9guESzWxbU/edX+rb0FGlTQFXoLzod0="
+  on:
+    tags: true
+    repo: oblador/react-native-animatable
+    condition: "$TRAVIS_TAG =~ ^v[0-9]+\\.[0-9]+\\.[0-9]+.*$"

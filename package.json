@@ -41,16 +41,14 @@
   },
   "license": "MIT",
   "jest": {
-    "preset": "jest-react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/Example/"
-    ]
+    "preset": "react-native",
+    "modulePathIgnorePatterns": ["<rootDir>/Examples/"],
+    "testPathIgnorePatterns": ["<rootDir>/Examples/"]
   },
   "devDependencies": {
-    "babel": "^6.5.2",
     "babel-eslint": "^7.0.0",
-    "babel-jest": "^20.0.3",
-    "babel-preset-react-native": "^1.9.0",
+    "babel-jest": "23.0.1",
+    "babel-preset-react-native": "4.0.0",
     "eslint": "^3.7.1",
     "eslint-config-airbnb": "^15.0.1",
     "eslint-config-prettier": "^2.9.0",
@@ -58,12 +56,11 @@
     "eslint-plugin-jsx-a11y": "^5.0.3",
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.0.1",
-    "jest": "20.0.4",
-    "jest-cli": "20.0.4",
-    "jest-react-native": "18.0.0",
+    "jest": "23.1.0",
+    "jest-cli": "23.1.0",
     "prettier": "^1.13.3",
-    "react": "*",
-    "react-native": "*",
+    "react": "16.3.1",
+    "react-native": "0.55.4",
     "react-test-renderer": "15.5.4"
   },
   "dependencies": {

@@ -177,6 +177,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       duration: undefined,
       easing: undefined,
       iterationCount: 1,
+      iterationDelay: 0,
       onAnimationBegin() {},
       onAnimationEnd() {},
       onTransitionBegin() {},

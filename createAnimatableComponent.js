@@ -95,14 +95,17 @@ function makeInterpolatedStyle(compiledAnimation, animationValue) {
 }
 
 function transitionToValue(
+  property,
   transitionValue,
   toValue,
   duration,
   easing,
   useNativeDriver = false,
   delay,
+  onTransitionBegin,
+  onTransitionEnd,
 ) {
-  if (duration || easing || delay) {
+  const animation = (duration || easing || delay) ?
     Animated.timing(transitionValue, {
       toValue,
       delay,
@@ -111,10 +114,10 @@ function transitionToValue(
         ? easing
         : EASING_FUNCTIONS[easing || 'ease'],
       useNativeDriver,
-    }).start();
-  } else {
-    Animated.spring(transitionValue, { toValue, useNativeDriver }).start();
-  }
+    }) :
+    Animated.spring(transitionValue, { toValue, useNativeDriver });
+  setTimeout(() => onTransitionBegin(property), delay);
+  animation.start(() => onTransitionEnd(property));
 }
 
 // Make (almost) any component animatable, similar to Animated.createAnimatedComponent
@@ -152,6 +155,8 @@ export default function createAnimatableComponent(WrappedComponent) {
       },
       onAnimationBegin: PropTypes.func,
       onAnimationEnd: PropTypes.func,
+      onTransitionBegin: PropTypes.func,
+      onTransitionEnd: PropTypes.func,
       style: PropTypes.oneOfType([
         PropTypes.number,
         PropTypes.array,
@@ -173,6 +178,8 @@ export default function createAnimatableComponent(WrappedComponent) {
       iterationCount: 1,
       onAnimationBegin() {},
       onAnimationEnd() {},
+      onTransitionBegin() {},
+      onTransitionEnd() {},
       style: undefined,
       transition: undefined,
       useNativeDriver: false,
@@ -489,12 +496,15 @@ export default function createAnimatableComponent(WrappedComponent) {
           transitionStyle === transitionValue
         ) {
           transitionToValue(
+            property,
             transitionValue,
             toValue,
             duration,
             easing,
             this.props.useNativeDriver,
             delay,
+            prop => this.props.onTransitionBegin(prop),
+            prop => this.props.onTransitionEnd(prop),
           );
         } else {
           let currentTransitionValue = currentTransitionValues[property];
@@ -520,12 +530,15 @@ export default function createAnimatableComponent(WrappedComponent) {
         const transitionValue = this.state.transitionValues[property];
         const toValue = toValues[property];
         transitionToValue(
+          property,
           transitionValue,
           toValue,
           duration,
           easing,
           this.props.useNativeDriver,
           delay,
+          prop => this.props.onTransitionBegin(prop),
+          prop => this.props.onTransitionEnd(prop),
         );
       });
     }

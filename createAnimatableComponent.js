@@ -153,6 +153,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         }
         return null;
       },
+      iterationDelay: PropTypes.number,
       onAnimationBegin: PropTypes.func,
       onAnimationEnd: PropTypes.func,
       onTransitionBegin: PropTypes.func,
@@ -404,7 +405,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
         delay: iterationDelay || 0,
-      }
+      };
 
       Animated.timing(animationValue, config).start(endState => {
         currentIteration += 1;

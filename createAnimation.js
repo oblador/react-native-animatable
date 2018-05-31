@@ -29,7 +29,9 @@ export default function createAnimation(definition) {
     return cache[cacheKey];
   }
 
-  const positions = Object.keys(definition).map(parsePosition).filter(notNull);
+  const positions = Object.keys(definition)
+    .map(parsePosition)
+    .filter(notNull);
   positions.sort(compareNumbers);
 
   if (positions.length < 2) {

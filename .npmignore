@@ -6,3 +6,4 @@
 __tests__
 node_modules
 Examples
+yarn.lock

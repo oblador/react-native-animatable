@@ -105,17 +105,19 @@ function transitionToValue(
   onTransitionBegin,
   onTransitionEnd,
 ) {
-  const animation = (duration || easing || delay) ?
-    Animated.timing(transitionValue, {
-      toValue,
-      delay,
-      duration: duration || 1000,
-      easing: typeof easing === 'function'
-        ? easing
-        : EASING_FUNCTIONS[easing || 'ease'],
-      useNativeDriver,
-    }) :
-    Animated.spring(transitionValue, { toValue, useNativeDriver });
+  const animation =
+    duration || easing || delay
+      ? Animated.timing(transitionValue, {
+          toValue,
+          delay,
+          duration: duration || 1000,
+          easing:
+            typeof easing === 'function'
+              ? easing
+              : EASING_FUNCTIONS[easing || 'ease'],
+          useNativeDriver,
+        })
+      : Animated.spring(transitionValue, { toValue, useNativeDriver });
   setTimeout(() => onTransitionBegin(property), delay);
   animation.start(() => onTransitionEnd(property));
 }

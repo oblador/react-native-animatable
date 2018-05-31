@@ -301,13 +301,14 @@ export default function createAnimatableComponent(WrappedComponent) {
         duration,
         delay,
         onAnimationBegin,
-        onAnimationEnd,
         iterationDelay,
       } = this.props;
       if (animation) {
         const startAnimation = () => {
           onAnimationBegin();
-          this.startAnimation(duration, 0, iterationDelay, onAnimationEnd);
+          this.startAnimation(duration, 0, iterationDelay, endState =>
+            this.props.onAnimationEnd(endState),
+          );
           this.delayTimer = null;
         };
         if (delay) {
@@ -326,7 +327,6 @@ export default function createAnimatableComponent(WrappedComponent) {
         easing,
         transition,
         onAnimationBegin,
-        onAnimationEnd,
       } = props;
 
       if (transition) {
@@ -338,7 +338,9 @@ export default function createAnimatableComponent(WrappedComponent) {
             this.setAnimation(animation);
           } else {
             onAnimationBegin();
-            this.animate(animation, duration).then(onAnimationEnd);
+            this.animate(animation, duration).then(endState =>
+              this.props.onAnimationEnd(endState),
+            );
           }
         } else {
           this.stopAnimation();
@@ -417,7 +419,12 @@ export default function createAnimatableComponent(WrappedComponent) {
           this.props.animation &&
           (iterationCount === 'infinite' || currentIteration < iterationCount)
         ) {
-          this.startAnimation(duration, currentIteration, iterationDelay, callback);
+          this.startAnimation(
+            duration,
+            currentIteration,
+            iterationDelay,
+            callback,
+          );
         } else if (callback) {
           callback(endState);
         }

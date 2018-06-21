@@ -104,6 +104,7 @@ function transitionToValue(
   delay,
   onTransitionBegin,
   onTransitionEnd,
+  springConfig = {},
 ) {
   const animation =
     duration || easing || delay
@@ -117,7 +118,11 @@ function transitionToValue(
               : EASING_FUNCTIONS[easing || 'ease'],
           useNativeDriver,
         })
-      : Animated.spring(transitionValue, { toValue, useNativeDriver });
+      : Animated.spring(transitionValue, {
+        toValue,
+        ...springConfig,
+        useNativeDriver
+      });
   setTimeout(() => onTransitionBegin(property), delay);
   animation.start(() => onTransitionEnd(property));
 }
@@ -519,6 +524,7 @@ export default function createAnimatableComponent(WrappedComponent) {
             delay,
             prop => this.props.onTransitionBegin(prop),
             prop => this.props.onTransitionEnd(prop),
+            this.props.springConfig
           );
         } else {
           let currentTransitionValue = currentTransitionValues[property];
@@ -553,6 +559,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           delay,
           prop => this.props.onTransitionBegin(prop),
           prop => this.props.onTransitionEnd(prop),
+          this.props.springConfig,
         );
       });
     }

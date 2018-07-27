@@ -118,7 +118,7 @@ interface AnimatableProperties<S extends {}> {
     easing?: Easing;
     iterationCount?: number | 'infinite';
     iterationDelay?: number;
-    transition?: keyof S | Array<keyof S>;
+    transition?: keyof S | ReadonlyArray<keyof S>;
     useNativeDriver?: boolean;
     onAnimationBegin?: Function;
     onAnimationEnd?: Function;

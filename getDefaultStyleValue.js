@@ -27,6 +27,9 @@ export default function getDefaultStyleValue(key, flatStyle) {
   if (key === 'fontSize') {
     return 14;
   }
+  if (key === 'shadowOffset') {
+    return { height: 0, width: 0 };
+  }
   if (key.indexOf('margin') === 0 || key.indexOf('padding') === 0) {
     for (let suffix, i = 0; i < DIRECTIONAL_SUFFICES.length; i++) {
       suffix = DIRECTIONAL_SUFFICES[i];

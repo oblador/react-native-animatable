@@ -7,6 +7,12 @@ import flattenStyle from './flattenStyle';
 import createAnimation from './createAnimation';
 import { getAnimationByName, getAnimationNames } from './registry';
 import EASING_FUNCTIONS from './easing';
+import {
+  getAnimationValue,
+  getDefaultAnimationValue,
+  setTransitionValue,
+  animateValue,
+} from './handleObjectValues'
 
 // These styles are not number based and thus needs to be interpolated
 const INTERPOLATION_STYLE_PROPERTIES = [
@@ -107,17 +113,21 @@ function transitionToValue(
 ) {
   const animation =
     duration || easing || delay
-      ? Animated.timing(transitionValue, {
+      ? animateValue(
+          Animated.timing,
+          property,
+          transitionValue,
           toValue,
-          delay,
-          duration: duration || 1000,
-          easing:
-            typeof easing === 'function'
+          {
+            delay,
+            duration: duration || 1000,
+            easing: typeof easing === 'function'
               ? easing
               : EASING_FUNCTIONS[easing || 'ease'],
-          useNativeDriver,
-        })
-      : Animated.spring(transitionValue, { toValue, useNativeDriver });
+            useNativeDriver,
+          }
+        )
+      : animateValue(Animated.spring, property, transitionValue, toValue, { useNativeDriver });
   setTimeout(() => onTransitionBegin(property), delay);
   animation.start(() => onTransitionEnd(property));
 }
@@ -243,7 +253,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           transitionValues[key] = new Animated.Value(0);
           styleValues[key] = value;
         } else {
-          const animationValue = new Animated.Value(value);
+          const animationValue = getAnimationValue(key, value);
           transitionValues[key] = animationValue;
           styleValues[key] = animationValue;
         }
@@ -446,12 +456,13 @@ export default function createAnimatableComponent(WrappedComponent) {
         const toValue = toValuesFlat[property];
         let transitionValue = transitionValues[property];
         if (!transitionValue) {
-          transitionValue = new Animated.Value(0);
+          transitionValue = getDefaultAnimationValue(property);
         }
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1;
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
+        // no currently known object styles need interpolation (shadowOffset)
         if (needsInterpolation) {
           transitionValue.setValue(0);
           transitionStyle[property] = transitionValue.interpolate({
@@ -461,6 +472,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           currentTransitionValues[property] = toValue;
           toValuesFlat[property] = 1;
         } else {
+          // no currently known object styles need zero clamping (shadowOffset)
           if (needsZeroClamping) {
             transitionStyle[property] = transitionValue.interpolate({
               inputRange: [0, 1],
@@ -471,7 +483,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           } else {
             transitionStyle[property] = transitionValue;
           }
-          transitionValue.setValue(fromValue);
+          setTransitionValue(key, transitionValue, fromValue);
         }
       });
       this.setState(

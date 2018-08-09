@@ -10,7 +10,7 @@
     "lint": "./node_modules/.bin/eslint ./*.js",
     "test": "npm run lint && npm run jest",
     "format": "./node_modules/.bin/prettier --write {,definitions/,__tests__}*.js",
-    "build": "babel *.js --out-dir dist/",
+    "build": "babel *.js --out-dir dist/ --source-maps",
     "prepublish": "npm run build"
   },
   "keywords": [

@@ -15,6 +15,9 @@ export default function getDefaultStyleValue(key, flatStyle) {
   if (key === 'backgroundColor') {
     return 'rgba(0,0,0,0)';
   }
+  if (key === 'shadowColor') {
+    return 'rgba(0,0,0,0)';
+  }
   if (key === 'color' || key.indexOf('Color') !== -1) {
     return 'rgba(0,0,0,1)';
   }

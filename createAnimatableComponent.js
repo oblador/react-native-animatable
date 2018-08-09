@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, StyleSheet } from 'react-native';
 import wrapStyleTransforms from './wrapStyleTransforms';
 import getStyleValues from './getStyleValues';
 import flattenStyle from './flattenStyle';
@@ -32,6 +32,7 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'borderBottomColor',
   'borderLeftColor',
   'shadowColor',
+  'shadowOpacity',
   // Text styles
   'color',
   'textDecorationColor',

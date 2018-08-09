@@ -35,9 +35,9 @@ export function animateValue(animation, key, target, toValue, options = {}){
   if (key === 'shadowOffset'){
     return Animated.parallel(
       [
-        (isNumber(target.width) && isNumber(toValue.width)) &&
+        target.width && isNumber(toValue.width) &&
           animation(target.width, { toValue: toValue.width, ...options }),
-        (isNumber(target.height) && isNumber(toValue.height)) &&
+        target.height && isNumber(toValue.height) &&
           animation(target.height, { toValue: toValue.height, ...options })
       ].filter(a => a)
     )

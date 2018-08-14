@@ -484,7 +484,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           } else {
             transitionStyle[property] = transitionValue;
           }
-          setTransitionValue(key, transitionValue, fromValue);
+          setTransitionValue(property, transitionValue, fromValue);
         }
       });
       this.setState(

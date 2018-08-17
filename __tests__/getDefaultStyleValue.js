@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import getDefaultStyleValue from '../getDefaultStyleValue';
+import getDefaultStyleValue from '../src/getDefaultStyleValue';
 
 describe('getDefaultStyleValue', () => {
   it('should return 0deg for skew and rotate keys', () => {

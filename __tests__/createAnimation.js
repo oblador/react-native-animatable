@@ -1,6 +1,6 @@
 /* eslint-env jest */
 
-import createAnimation from '../createAnimation';
+import createAnimation from '../src/createAnimation';
 
 describe('createAnimation', () => {
   it('should support from and to keys', () => {

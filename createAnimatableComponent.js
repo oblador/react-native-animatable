@@ -33,6 +33,12 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'tintColor',
 ];
 
+const ANIMATE = {
+  ALWAYS: 1,
+  ON_MOUNT: 2,
+  ON_UPDATE: 3,
+}
+
 const ZERO_CLAMPED_STYLE_PROPERTIES = ['width', 'height'];
 
 // Create a copy of `source` without `keys`
@@ -170,6 +176,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         PropTypes.arrayOf(PropTypes.string),
       ]),
       useNativeDriver: PropTypes.bool,
+      whenToAnimate: PropTypes.oneOf([ANIMATE.ALWAYS, ANIMATE.ON_MOUNT, ANIMATE.ON_UPDATE]),
     };
 
     static defaultProps = {
@@ -187,6 +194,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       style: undefined,
       transition: undefined,
       useNativeDriver: false,
+      whenToAnimate: ANIMATE.ALWAYS,
     };
 
     constructor(props) {
@@ -302,9 +310,10 @@ export default function createAnimatableComponent(WrappedComponent) {
         delay,
         onAnimationBegin,
         iterationDelay,
+        whenToAnimate,
       } = this.props;
       if (animation) {
-        if (noAnimateOnMount) {
+        if (whenToAnimate === ANIMATE.ON_UPDATE) {
           this.startAnimation(0, 0);
         } else {
           const startAnimation = () => {
@@ -331,20 +340,22 @@ export default function createAnimatableComponent(WrappedComponent) {
         easing,
         transition,
         onAnimationBegin,
+        whenToAnimate,
       } = props;
-
       if (transition) {
         const values = getStyleValues(transition, props.style);
         this.transitionTo(values, duration, easing, delay);
       } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {
-          if (this.delayTimer) {
-            this.setAnimation(animation);
-          } else {
-            onAnimationBegin();
-            this.animate(animation, duration).then(endState =>
-              this.props.onAnimationEnd(endState),
-            );
+          if (whenToAnimate !== ANIMATE.ON_MOUNT) {
+            if (this.delayTimer) {
+              this.setAnimation(animation);
+            } else {
+              onAnimationBegin();
+              this.animate(animation, duration).then(endState =>
+                this.props.onAnimationEnd(endState),
+              );
+            }
           }
         } else {
           this.stopAnimation();

@@ -33,7 +33,7 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'tintColor',
 ];
 
-const ANIMATE = {
+export const RUN_ANIMATION = {
   ALWAYS: 1,
   ON_MOUNT: 2,
   ON_UPDATE: 3,
@@ -176,7 +176,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         PropTypes.arrayOf(PropTypes.string),
       ]),
       useNativeDriver: PropTypes.bool,
-      whenToAnimate: PropTypes.oneOf([ANIMATE.ALWAYS, ANIMATE.ON_MOUNT, ANIMATE.ON_UPDATE]),
+      whenToAnimate: PropTypes.oneOf([RUN_ANIMATION.ALWAYS, RUN_ANIMATION.ON_MOUNT, RUN_ANIMATION.ON_UPDATE]),
     };
 
     static defaultProps = {
@@ -194,7 +194,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       style: undefined,
       transition: undefined,
       useNativeDriver: false,
-      whenToAnimate: ANIMATE.ALWAYS,
+      whenToAnimate: RUN_ANIMATION.ALWAYS,
     };
 
     constructor(props) {
@@ -313,7 +313,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         whenToAnimate,
       } = this.props;
       if (animation) {
-        if (whenToAnimate === ANIMATE.ON_UPDATE) {
+        if (whenToAnimate === RUN_ANIMATION.ON_UPDATE) {
           this.startAnimation(0, 0);
         } else {
           const startAnimation = () => {
@@ -347,7 +347,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         this.transitionTo(values, duration, easing, delay);
       } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {
-          if (whenToAnimate !== ANIMATE.ON_MOUNT) {
+          if (whenToAnimate !== RUN_ANIMATION.ON_MOUNT) {
             if (this.delayTimer) {
               this.setAnimation(animation);
             } else {

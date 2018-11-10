@@ -46,7 +46,7 @@ type Easing =
     'ease-in-out-back'|
      EasingFunction;
 
-type Animation =
+export type Animation =
     'bounce' |
     'flash' |
     'jello' |

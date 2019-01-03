@@ -563,7 +563,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         throw new Error('You cannot combine animation and transition props');
       }
       const restProps = omit(
-        Object.keys(AnimatableComponent.propTypes),
+        ['animation', 'duration', 'direction', 'delay', 'easing', 'iterationCount', 'iterationDelay', 'onAnimationBegin', 'onAnimationEnd', 'onTransitionBegin', 'onTransitionEnd', 'style', 'transition', 'useNativeDriver'],
         this.props,
       );
 

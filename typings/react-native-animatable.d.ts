@@ -46,7 +46,7 @@ type Easing =
     'ease-in-out-back'|
      EasingFunction;
 
-type Animation =
+export type Animation =
     'bounce' |
     'flash' |
     'jello' |
@@ -150,7 +150,7 @@ interface AnimatableComponent<P extends {}, S extends {}> extends
     ): void;
 }
 
-interface CustomAnimation<T = TextStyle & ViewStyle & ImageStyle> {
+export interface CustomAnimation<T = TextStyle & ViewStyle & ImageStyle> {
     from?: T;
     to?: T;
     style?: T;

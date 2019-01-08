@@ -33,6 +33,12 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'tintColor',
 ];
 
+export const RUN_ANIMATION = {
+  ALWAYS: 1,
+  ON_MOUNT: 2,
+  ON_UPDATE: 3,
+}
+
 const ZERO_CLAMPED_STYLE_PROPERTIES = ['width', 'height'];
 
 // Create a copy of `source` without `keys`
@@ -170,6 +176,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         PropTypes.arrayOf(PropTypes.string),
       ]),
       useNativeDriver: PropTypes.bool,
+      whenToAnimate: PropTypes.oneOf([RUN_ANIMATION.ALWAYS, RUN_ANIMATION.ON_MOUNT, RUN_ANIMATION.ON_UPDATE]),
     };
 
     static defaultProps = {
@@ -187,6 +194,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       style: undefined,
       transition: undefined,
       useNativeDriver: false,
+      whenToAnimate: RUN_ANIMATION.ALWAYS,
     };
 
     constructor(props) {
@@ -302,19 +310,24 @@ export default function createAnimatableComponent(WrappedComponent) {
         delay,
         onAnimationBegin,
         iterationDelay,
+        whenToAnimate,
       } = this.props;
       if (animation) {
-        const startAnimation = () => {
-          onAnimationBegin();
-          this.startAnimation(duration, 0, iterationDelay, endState =>
-            this.props.onAnimationEnd(endState),
-          );
-          this.delayTimer = null;
-        };
-        if (delay) {
-          this.delayTimer = setTimeout(startAnimation, delay);
+        if (whenToAnimate === RUN_ANIMATION.ON_UPDATE) {
+          this.startAnimation(0, 0);
         } else {
-          startAnimation();
+          const startAnimation = () => {
+            onAnimationBegin();
+            this.startAnimation(duration, 0, iterationDelay, endState =>
+              this.props.onAnimationEnd(endState),
+            );
+            this.delayTimer = null;
+          };
+          if (delay) {
+            this.delayTimer = setTimeout(startAnimation, delay);
+          } else {
+            startAnimation();
+          }
         }
       }
     }
@@ -327,20 +340,22 @@ export default function createAnimatableComponent(WrappedComponent) {
         easing,
         transition,
         onAnimationBegin,
+        whenToAnimate,
       } = props;
-
       if (transition) {
         const values = getStyleValues(transition, props.style);
         this.transitionTo(values, duration, easing, delay);
       } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {
-          if (this.delayTimer) {
-            this.setAnimation(animation);
-          } else {
-            onAnimationBegin();
-            this.animate(animation, duration).then(endState =>
-              this.props.onAnimationEnd(endState),
-            );
+          if (whenToAnimate !== RUN_ANIMATION.ON_MOUNT) {
+            if (this.delayTimer) {
+              this.setAnimation(animation);
+            } else {
+              onAnimationBegin();
+              this.animate(animation, duration).then(endState =>
+                this.props.onAnimationEnd(endState),
+              );
+            }
           }
         } else {
           this.stopAnimation();
@@ -403,11 +418,19 @@ export default function createAnimatableComponent(WrappedComponent) {
       if (reversed) {
         easing = Easing.out(easing);
       }
+
+      let effectiveDuration = 1000;
+      if (typeof duration === 'number') {
+        effectiveDuration = duration;
+      } else if (typeof this.props.duration === 'number') {
+        effectiveDuration = this.props.duration;
+      }
+
       const config = {
         toValue,
         easing,
         isInteraction: iterationCount <= 1,
-        duration: duration || this.props.duration || 1000,
+        duration: effectiveDuration,
         useNativeDriver,
         delay: iterationDelay || 0,
       };

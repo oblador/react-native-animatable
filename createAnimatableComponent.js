@@ -330,7 +330,18 @@ export default function createAnimatableComponent(WrappedComponent) {
       } = props;
 
       if (transition) {
+        const oldProps = this.props;
         const values = getStyleValues(transition, props.style);
+        // Don't transition values that are already correct or currently transitioning to the new value.
+        // Prevents transitions being aborted when props are repeated before transition ends.
+        const oldValues = getStyleValues(oldProps.transition, oldProps.style);
+        for (styleAttribute in values) {
+          const oldValue = oldValues[styleAttribute];
+          const newValue = values[styleAttribute];
+          if (oldValue === newValue) {
+            delete values[styleAttribute];
+          }
+        }
         this.transitionTo(values, duration, easing, delay);
       } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {

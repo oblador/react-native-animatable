@@ -335,7 +335,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         // Don't transition values that are already correct or currently transitioning to the new value.
         // Prevents transitions being aborted when props are repeated before transition ends.
         const oldValues = getStyleValues(oldProps.transition, oldProps.style);
-        Object.keys(values).forEach( (styleAttribute) => {
+        Object.keys(values).forEach( styleAttribute => {
           const oldValue = oldValues[styleAttribute];
           const newValue = values[styleAttribute];
           if (oldValue === newValue) {

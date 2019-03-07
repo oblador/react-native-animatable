@@ -472,7 +472,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         }
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
-          typeof value !== 'number';
+          typeof toValue !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         if (needsInterpolation) {
@@ -525,8 +525,12 @@ export default function createAnimatableComponent(WrappedComponent) {
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(toValue) !== 'number';
 =======
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
+<<<<<<< HEAD
           typeof value !== 'number';
 >>>>>>> Bump prettier
+=======
+          typeof toValue !== 'number';
+>>>>>>> Fix all animations using interpolation
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         const transitionStyle = this.state.transitionStyle[property];

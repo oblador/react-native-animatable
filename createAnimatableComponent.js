@@ -460,7 +460,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           transitionValue = new Animated.Value(0);
         }
         const needsInterpolation =
-          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(value) !== 'number';
+          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(toValue) !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         if (needsInterpolation) {
@@ -509,7 +509,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       Object.keys(toValuesFlat).forEach(property => {
         const toValue = toValuesFlat[property];
         const needsInterpolation =
-          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(value) !== 'number';
+          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(toValue) !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         const transitionStyle = this.state.transitionStyle[property];

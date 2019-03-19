@@ -325,6 +325,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         delay,
         duration,
         easing,
+        iterationDelay,
         transition,
         onAnimationBegin,
       } = props;
@@ -338,7 +339,7 @@ export default function createAnimatableComponent(WrappedComponent) {
             this.setAnimation(animation);
           } else {
             onAnimationBegin();
-            this.animate(animation, duration).then(endState =>
+            this.animate(animation, duration, iterationDelay).then(endState =>
               this.props.onAnimationEnd(endState),
             );
           }

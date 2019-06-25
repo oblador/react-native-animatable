@@ -33,6 +33,8 @@ const INTERPOLATION_STYLE_PROPERTIES = [
   'tintColor',
 ];
 
+const DEFAULT_DURATION = 1000;
+
 const ZERO_CLAMPED_STYLE_PROPERTIES = ['width', 'height'];
 
 // Create a copy of `source` without `keys`
@@ -94,6 +96,15 @@ function makeInterpolatedStyle(compiledAnimation, animationValue) {
   return wrapStyleTransforms(style);
 }
 
+function getDurationDefault(duration, fallback) {
+  if (typeof duration === 'number' && duration >= 0) {
+    return duration;
+  } else if (typeof fallback === 'number' && fallback >= 0) {
+    return fallback;
+  }
+  return DEFAULT_DURATION;
+}
+
 function transitionToValue(
   property,
   transitionValue,
@@ -110,7 +121,7 @@ function transitionToValue(
       ? Animated.timing(transitionValue, {
           toValue,
           delay,
-          duration: duration || 1000,
+          duration: getDurationDefault(duration),
           easing:
             typeof easing === 'function'
               ? easing
@@ -408,7 +419,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         toValue,
         easing,
         isInteraction: iterationCount <= 1,
-        duration: duration || this.props.duration || 1000,
+        duration: getDurationDefault(duration, this.props.duration),
         useNativeDriver,
         delay: iterationDelay || 0,
       };

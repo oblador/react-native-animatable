@@ -98,6 +98,11 @@ class ExampleView extends Component {
 
 To stop any ongoing animations, just invoke `stopAnimation()` on that element. 
 
+You can also animate imperatively by using the `animate()` function on the element for custom animations, for example:
+```
+this.view.animate({ 0: { opacity: 0 }, 1: { opacity: 1 } });
+```
+
 #### Generic transitions
 
 ##### `transition(fromValues, toValues[[, duration], easing])`

@@ -319,7 +319,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    componentWillReceiveProps(props) {
+    UNSAFE_componentWillReceiveProps(props) {
       const {
         animation,
         delay,

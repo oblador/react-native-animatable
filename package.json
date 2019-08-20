@@ -65,5 +65,9 @@
   },
   "dependencies": {
     "prop-types": "^15.5.10"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
   }
 }

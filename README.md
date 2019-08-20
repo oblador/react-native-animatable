@@ -149,6 +149,9 @@ const fadeIn = {
   },
 };
 ```
+```html
+<Animatable.Text animation={fadeIn} >Fade me in</Animatable.Text>
+```
 
 Combining multiple styles to create a zoom out animation: 
 
@@ -167,6 +170,9 @@ const zoomOut = {
     scale: 0,
   },
 };
+```
+```html
+<Animatable.Text animation={zoomOut} >Zoom me out</Animatable.Text>
 ```
 
 To make your animations globally available by referring to them by a name, you can register them with `initializeRegistryWithDefinitions`. This function can also be used to replace built in animations in case you want to tweak some value. 

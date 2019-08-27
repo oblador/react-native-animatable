@@ -319,34 +319,40 @@ export default function createAnimatableComponent(WrappedComponent) {
       }
     }
 
-    componentWillReceiveProps(props) {
-      const {
-        animation,
-        delay,
-        duration,
-        easing,
-        iterationDelay,
-        transition,
-        onAnimationBegin,
-      } = props;
-
-      if (transition) {
-        const values = getStyleValues(transition, props.style);
-        this.transitionTo(values, duration, easing, delay);
-      } else if (!deepEquals(animation, this.props.animation)) {
-        if (animation) {
-          if (this.delayTimer) {
-            this.setAnimation(animation);
+    static getDerivedStateFromProps(nextProps) {
+      if(this.props) {
+        const {
+          animation,
+          delay,
+          duration,
+          easing,
+          iterationDelay,
+          transition,
+          onAnimationBegin,
+        } = nextProps;
+  
+        if (transition) {
+          const values = getStyleValues(transition, nextProps.style);
+          this.transitionTo(values, duration, easing, delay);
+        } else if (!deepEquals(animation, this.props.animation)) {
+          if (animation) {
+            if (this.delayTimer) {
+              this.setAnimation(animation);
+            } else {
+              onAnimationBegin();
+              this.animate(animation, duration, iterationDelay).then(endState =>
+                this.props.onAnimationEnd(endState),
+              );
+            }
           } else {
-            onAnimationBegin();
-            this.animate(animation, duration, iterationDelay).then(endState =>
-              this.props.onAnimationEnd(endState),
-            );
+            this.stopAnimation();
           }
-        } else {
-          this.stopAnimation();
         }
       }
+
+      return {
+        ...nextProps
+      };
     }
 
     componentWillUnmount() {

@@ -331,7 +331,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       } = this.props;
 
       if (transition) {
-        const values = getStyleValues(transition, props.style);
+        const values = getStyleValues(transition, this.props.style);
         this.transitionTo(values, duration, easing, delay);
       } else if (!deepEquals(animation, prevProps.animation)) {
         if (animation) {

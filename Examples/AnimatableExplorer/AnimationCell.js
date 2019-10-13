@@ -41,8 +41,7 @@ export default class AnimationCell extends PureComponent {
         <View
           ref={this.handleRef}
           style={[{ backgroundColor: this.props.color }, styles.cell]}
-          useNativeDriver={this.props.useNativeDriver}
-        >
+          useNativeDriver={this.props.useNativeDriver}>
           <Text style={styles.name}>{this.props.animationType}</Text>
         </View>
       </TouchableWithoutFeedback>

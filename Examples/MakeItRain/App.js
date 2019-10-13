@@ -9,11 +9,23 @@ const MONEY_DIMENSIONS = { width: 49, height: 26 };
 const SCREEN_DIMENSIONS = Dimensions.get('window');
 const WIGGLE_ROOM = 50;
 
-const FlippingImage = ({ back = false, delay, duration = 1000, source, style = {} }) => (
+const FlippingImage = ({
+  back = false,
+  delay,
+  duration = 1000,
+  source,
+  style = {},
+}) => (
   <Animatable.Image
     animation={{
-      from: { rotateX: back ? '0deg' : '180deg', rotate: !back ? '180deg' : '0deg' },
-      to: { rotateX: back ? '360deg' : '-180deg', rotate: !back ? '180deg' : '0deg' },
+      from: {
+        rotateX: back ? '0deg' : '180deg',
+        rotate: !back ? '180deg' : '0deg',
+      },
+      to: {
+        rotateX: back ? '360deg' : '-180deg',
+        rotate: !back ? '180deg' : '0deg',
+      },
     }}
     duration={duration}
     delay={delay}
@@ -28,7 +40,13 @@ const FlippingImage = ({ back = false, delay, duration = 1000, source, style = {
   />
 );
 
-const Swinging = ({ amplitude, rotation = 7, delay, duration = 700, children }) => (
+const Swinging = ({
+  amplitude,
+  rotation = 7,
+  delay,
+  duration = 700,
+  children,
+}) => (
   <Animatable.View
     animation={{
       0: {
@@ -52,8 +70,7 @@ const Swinging = ({ amplitude, rotation = 7, delay, duration = 700, children }) 
     direction="alternate"
     easing="ease-in-out"
     iterationCount="infinite"
-    useNativeDriver
-  >
+    useNativeDriver>
     {children}
   </Animatable.View>
 );
@@ -69,8 +86,7 @@ const Falling = ({ duration, delay, style, children }) => (
     easing={t => Math.pow(t, 1.7)}
     iterationCount="infinite"
     useNativeDriver
-    style={style}
-  >
+    style={style}>
     {children}
   </Animatable.View>
 );
@@ -103,10 +119,13 @@ const MakeItRain = ({ count = 15, duration = 3000 }) => (
           style={{
             position: 'absolute',
             paddingHorizontal: WIGGLE_ROOM,
-            left: randomize(SCREEN_DIMENSIONS.width - MONEY_DIMENSIONS.width) - WIGGLE_ROOM,
-          }}
-        >
-          <Swinging amplitude={MONEY_DIMENSIONS.width / 5} delay={randomize(duration)}>
+            left:
+              randomize(SCREEN_DIMENSIONS.width - MONEY_DIMENSIONS.width) -
+              WIGGLE_ROOM,
+          }}>
+          <Swinging
+            amplitude={MONEY_DIMENSIONS.width / 5}
+            delay={randomize(duration)}>
             <FlippingImage source={moneyFront} delay={flipDelay} />
             <FlippingImage
               source={moneyBack}

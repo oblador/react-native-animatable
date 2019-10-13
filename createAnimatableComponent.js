@@ -239,7 +239,10 @@ export default function createAnimatableComponent(WrappedComponent) {
       );
       Object.keys(currentTransitionValues).forEach(key => {
         const value = currentTransitionValues[key];
-        if (INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1 || typeof(value) !== 'number') {
+        if (
+          INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1 ||
+          typeof value !== 'number'
+        ) {
           transitionValues[key] = new Animated.Value(0);
           styleValues[key] = value;
         } else {
@@ -456,7 +459,8 @@ export default function createAnimatableComponent(WrappedComponent) {
           transitionValue = new Animated.Value(0);
         }
         const needsInterpolation =
-          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(value) !== 'number';
+          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
+          typeof value !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         if (needsInterpolation) {
@@ -505,7 +509,8 @@ export default function createAnimatableComponent(WrappedComponent) {
       Object.keys(toValuesFlat).forEach(property => {
         const toValue = toValuesFlat[property];
         const needsInterpolation =
-          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 || typeof(value) !== 'number';
+          INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
+          typeof value !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         const transitionStyle = this.state.transitionStyle[property];
@@ -570,7 +575,22 @@ export default function createAnimatableComponent(WrappedComponent) {
         throw new Error('You cannot combine animation and transition props');
       }
       const restProps = omit(
-        ['animation', 'duration', 'direction', 'delay', 'easing', 'iterationCount', 'iterationDelay', 'onAnimationBegin', 'onAnimationEnd', 'onTransitionBegin', 'onTransitionEnd', 'style', 'transition', 'useNativeDriver'],
+        [
+          'animation',
+          'duration',
+          'direction',
+          'delay',
+          'easing',
+          'iterationCount',
+          'iterationDelay',
+          'onAnimationBegin',
+          'onAnimationEnd',
+          'onTransitionBegin',
+          'onTransitionEnd',
+          'style',
+          'transition',
+          'useNativeDriver',
+        ],
         this.props,
       );
 

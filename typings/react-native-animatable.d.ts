@@ -13,8 +13,8 @@ import {
     ClassicComponentClass
 } from 'react';
 
-type EasingFunction ={(t: number) :number};
-type Easing =
+export type EasingFunction ={(t: number) :number};
+export type Easing =
     'linear' |
     'ease' |
     'ease-in' |
@@ -110,11 +110,17 @@ export type Animation =
     'zoomOutLeft' |
     'zoomOutRight';
 
+export type Direction =
+    'normal' |
+    'reverse' |
+    'alternate' |
+    'alternate-reverse';
+
 interface AnimatableProperties<S extends {}> {
     animation?: Animation | string | CustomAnimation;
     duration?: number;
     delay?: number;
-    direction?: 'normal' | 'reverse' | 'alternate'| 'alternate-reverse';
+    direction?: Direction;
     easing?: Easing;
     iterationCount?: number | 'infinite';
     iterationDelay?: number;

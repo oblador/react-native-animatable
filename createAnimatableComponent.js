@@ -285,6 +285,7 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     ref = null;
+
     handleRef = ref => {
       this.ref = ref;
     };
@@ -357,11 +358,16 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     setAnimation(animation, callback) {
       const compiledAnimation = getCompiledAnimation(animation);
-      const animationStyle = makeInterpolatedStyle(
-        compiledAnimation,
-        this.state.animationValue,
+      this.setState(
+        state => ({
+          animationStyle: makeInterpolatedStyle(
+            compiledAnimation,
+            state.animationValue,
+          ),
+          compiledAnimation,
+        }),
+        callback,
       );
-      this.setState({ animationStyle, compiledAnimation }, callback);
     }
 
     animate(animation, duration, iterationDelay) {

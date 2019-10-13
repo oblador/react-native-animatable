@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import {
   SafeAreaView,
   SectionList,
-  Slider,
   StyleSheet,
   TouchableWithoutFeedback,
 } from 'react-native';
 import { createAnimatableComponent, View, Text } from 'react-native-animatable';
+import Slider from '@react-native-community/slider';
 import AnimationCell from './AnimationCell';
 import GROUPED_ANIMATION_TYPES from './grouped-animation-types.json';
 
@@ -27,7 +27,11 @@ const COLORS = [
   '#302614', // brown
 ];
 
-const NATIVE_INCOMPATIBLE_ANIMATIONS = ['jello', 'lightSpeedIn', 'lightSpeedOut'];
+const NATIVE_INCOMPATIBLE_ANIMATIONS = [
+  'jello',
+  'lightSpeedIn',
+  'lightSpeedOut',
+];
 
 const styles = StyleSheet.create({
   container: {
@@ -134,11 +138,11 @@ export default class ExampleView extends Component {
             maximumValue={2000}
           />
         </View>
-        <TouchableWithoutFeedback onPress={() => this.setState({ toggledOn: !toggledOn })}>
+        <TouchableWithoutFeedback
+          onPress={() => this.setState({ toggledOn: !toggledOn })}>
           <Text
             style={[styles.toggle, toggledOn && styles.toggledOn]}
-            transition={['color', 'rotate', 'fontSize']}
-          >
+            transition={['color', 'rotate', 'fontSize']}>
             Toggle me!
           </Text>
         </TouchableWithoutFeedback>
@@ -163,7 +167,9 @@ export default class ExampleView extends Component {
               animationType={item}
               color={COLORS[index % COLORS.length]}
               onPress={this.handleRowPressed}
-              useNativeDriver={NATIVE_INCOMPATIBLE_ANIMATIONS.indexOf(item) === -1}
+              useNativeDriver={
+                NATIVE_INCOMPATIBLE_ANIMATIONS.indexOf(item) === -1
+              }
             />
           )}
         />

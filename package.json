@@ -9,7 +9,7 @@
     "jest:watch": "npm run jest -- --watch",
     "lint": "./node_modules/.bin/eslint ./*.js",
     "test": "npm run lint && npm run jest",
-    "format": "./node_modules/.bin/prettier --write {,definitions/,__tests__}*.js"
+    "format": "./node_modules/.bin/prettier --write {,definitions/,__tests__/}*.js"
   },
   "keywords": [
     "react-native",
@@ -55,7 +55,7 @@
     "babel-preset-react-native": "4.0.0",
     "eslint": "6.1.0",
     "eslint-config-airbnb": "18.0.1",
-    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^2.6.0",
@@ -63,7 +63,7 @@
     "eslint-plugin-react-hooks": "^1.7.0",
     "jest": "23.1.0",
     "jest-cli": "23.1.0",
-    "prettier": "^1.13.3",
+    "prettier": "^1.18.2",
     "react": "16.3.1",
     "react-native": "0.55.4",
     "react-test-renderer": "15.5.4"

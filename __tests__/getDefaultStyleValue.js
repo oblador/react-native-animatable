@@ -12,17 +12,29 @@ describe('getDefaultStyleValue', () => {
 
   it('should fallback to general margins', () => {
     expect(getDefaultStyleValue('marginTop', { margin: 10 })).toEqual(10);
-    expect(getDefaultStyleValue('marginTop', { marginVertical: 10 })).toEqual(10);
+    expect(getDefaultStyleValue('marginTop', { marginVertical: 10 })).toEqual(
+      10,
+    );
     expect(getDefaultStyleValue('marginLeft', { margin: 10 })).toEqual(10);
-    expect(getDefaultStyleValue('marginLeft', { marginVertical: 10 })).toEqual(0);
-    expect(getDefaultStyleValue('marginHorizontal', { margin: 10 })).toEqual(10);
+    expect(getDefaultStyleValue('marginLeft', { marginVertical: 10 })).toEqual(
+      0,
+    );
+    expect(getDefaultStyleValue('marginHorizontal', { margin: 10 })).toEqual(
+      10,
+    );
   });
 
   it('should fallback to general paddings', () => {
     expect(getDefaultStyleValue('paddingTop', { padding: 10 })).toEqual(10);
-    expect(getDefaultStyleValue('paddingTop', { paddingVertical: 10 })).toEqual(10);
+    expect(getDefaultStyleValue('paddingTop', { paddingVertical: 10 })).toEqual(
+      10,
+    );
     expect(getDefaultStyleValue('paddingLeft', { padding: 10 })).toEqual(10);
-    expect(getDefaultStyleValue('paddingLeft', { paddingVertical: 10 })).toEqual(0);
-    expect(getDefaultStyleValue('paddingHorizontal', { padding: 10 })).toEqual(10);
+    expect(
+      getDefaultStyleValue('paddingLeft', { paddingVertical: 10 }),
+    ).toEqual(0);
+    expect(getDefaultStyleValue('paddingHorizontal', { padding: 10 })).toEqual(
+      10,
+    );
   });
 });

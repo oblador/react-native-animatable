@@ -50,8 +50,10 @@
     ]
   },
   "devDependencies": {
-    "babel-eslint": "^7.0.0",
-    "babel-jest": "23.0.1",
+    "@babel/core": "^7.6.4",
+    "@babel/runtime": "^7.6.3",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^24.9.0",
     "babel-preset-react-native": "4.0.0",
     "eslint": "6.1.0",
     "eslint-config-airbnb": "18.0.1",
@@ -61,14 +63,13 @@
     "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^1.7.0",
-    "jest": "23.1.0",
-    "jest-cli": "23.1.0",
+    "jest": "^24.9.0",
     "prettier": "^1.18.2",
-    "react": "16.3.1",
-    "react-native": "0.55.4",
-    "react-test-renderer": "15.5.4"
+    "react": "16.9.0",
+    "react-native": "0.61.2",
+    "react-test-renderer": "16.9.0"
   },
   "dependencies": {
-    "prop-types": "^15.5.10"
+    "prop-types": "^15.7.2"
   }
 }

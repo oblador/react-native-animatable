@@ -170,6 +170,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         PropTypes.arrayOf(PropTypes.string),
       ]),
       useNativeDriver: PropTypes.bool,
+      isInteraction: PropTypes.bool,
     };
 
     static defaultProps = {
@@ -187,6 +188,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       style: undefined,
       transition: undefined,
       useNativeDriver: false,
+      isInteraction: undefined,
     };
 
     constructor(props) {

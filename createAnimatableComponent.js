@@ -396,7 +396,7 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     startAnimation(duration, iteration, iterationDelay, callback) {
       const { animationValue, compiledAnimation } = this.state;
-      const { direction, iterationCount, useNativeDriver } = this.props;
+      const { direction, iterationCount, useNativeDriver, isInteraction } = this.props;
       let easing = this.props.easing || compiledAnimation.easing || 'ease';
       let currentIteration = iteration || 0;
       const fromValue = getAnimationOrigin(currentIteration, direction);
@@ -417,7 +417,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       const config = {
         toValue,
         easing,
-        isInteraction: iterationCount <= 1,
+        isInteraction: typeof isInteraction !== "undefined" ? isInteraction : iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
         delay: iterationDelay || 0,

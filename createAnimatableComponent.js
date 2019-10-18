@@ -591,6 +591,7 @@ export default function createAnimatableComponent(WrappedComponent) {
           'style',
           'transition',
           'useNativeDriver',
+          'isInteraction',
         ],
         this.props,
       );

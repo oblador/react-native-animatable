@@ -126,6 +126,7 @@ interface AnimatableProperties<S extends {}> {
     iterationDelay?: number;
     transition?: keyof S | ReadonlyArray<keyof S>;
     useNativeDriver?: boolean;
+    isInteraction?: boolean;
     onAnimationBegin?: Function;
     onAnimationEnd?: Function;
     onTransitionBegin?: (property: string) => void;

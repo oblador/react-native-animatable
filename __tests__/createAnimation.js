@@ -131,6 +131,6 @@ describe('createAnimation', () => {
     }
     const firstAnimation = createAnimation(definition)
     const secondAnimation = createAnimation(definition)
-    expect(secondAnimation).toEqual(firstAnimation)
+    expect(secondAnimation).toBe(firstAnimation)
   });
 });

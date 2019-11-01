@@ -49,6 +49,17 @@ describe('createAnimation', () => {
     ).toThrow('Animation definitions must have at least two values.');
   });
 
+  it('should throw if one keyframe is invalid', () => {
+    expect(() =>
+      createAnimation({
+        unparsed: 0.1,
+        to: {
+          opacity: 1,
+        },
+      }),
+    ).toThrow('Animation definitions must have at least two values.')
+  });
+
   it('should support and flatten transform values', () => {
     expect(
       createAnimation({
@@ -107,5 +118,19 @@ describe('createAnimation', () => {
         outputRange: [0, 1],
       },
     });
+  });
+
+  it('should return value from cache', () => {
+    const definition = {
+      from: {
+        opacity: 0,
+      },
+      to: {
+        opacity: 1,
+      },
+    }
+    const firstAnimation = createAnimation(definition)
+    const secondAnimation = createAnimation(definition)
+    expect(secondAnimation).toBe(firstAnimation)
   });
 });

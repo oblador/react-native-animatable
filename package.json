@@ -47,7 +47,9 @@
     ],
     "testPathIgnorePatterns": [
       "<rootDir>/Examples/"
-    ]
+    ],
+    "collectCoverage": true,
+    "coverageDirectory": "<rootDir>/coverage/"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

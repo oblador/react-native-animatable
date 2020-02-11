@@ -10,7 +10,8 @@ import {
 import {
     StatelessComponent,
     ComponentClass,
-    ClassicComponentClass
+    ClassicComponentClass,
+    Component
 } from 'react';
 
 export type EasingFunction ={(t: number) :number};
@@ -139,7 +140,12 @@ type AnimatableAnimationMethods =
 interface AnimatableComponent<P extends {}, S extends {}> extends
     NativeMethodsMixin,
     AnimatableAnimationMethods,
+    Component,
     ClassicComponentClass<AnimatableProperties<S> & P> {
+
+    refs: {
+        [key: string]: Component<P, S>
+    }
 
     stopAnimation(): void;
 

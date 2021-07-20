@@ -68,7 +68,7 @@
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
     "react": "16.9.0",
-    "react-native": "0.61.2",
+    "react-native": "0.62.3",
     "react-test-renderer": "16.9.0"
   },
   "dependencies": {

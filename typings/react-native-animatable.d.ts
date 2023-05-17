@@ -8,7 +8,7 @@ import {
     ImageStyle
 } from 'react-native';
 import {
-    StatelessComponent,
+    FunctionComponent,
     ComponentClass,
     ClassicComponentClass,
     Component
@@ -186,7 +186,7 @@ export function initializeRegistryWithDefinitions(
 
 type GetPropertyType<B, K extends keyof B> = B[K];
 export function createAnimatableComponent<P extends {style?: any}, S = GetPropertyType<P, 'style'>> (
-    Component: ComponentClass<P> | StatelessComponent<P> | ClassicComponentClass<P>
+    Component: ComponentClass<P> | FunctionComponent<P> | ClassicComponentClass<P>
 ) : AnimatableComponent<P, S>;
 
 export const View : AnimatableComponent<ViewProperties, ViewStyle>;

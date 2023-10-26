@@ -1,7 +1,7 @@
 # react-native-animatable
 Declarative transitions and animations for React Native
 
-[![Travis](https://img.shields.io/travis/oblador/react-native-animatable.svg)](https://travis-ci.org/oblador/react-native-animatable) [![npm](https://img.shields.io/npm/v/react-native-animatable.svg)](https://npmjs.com/package/react-native-animatable) [![npm](https://img.shields.io/npm/dm/react-native-animatable.svg)](https://npmjs.com/package/react-native-animatable)
+[![Tests](https://github.com/oblador/react-native-animatable/actions/workflows/tests.yml/badge.svg)](https://github.com/oblador/react-native-animatable/actions/workflows/tests.yml) [![npm](https://img.shields.io/npm/v/react-native-animatable.svg)](https://npmjs.com/package/react-native-animatable) [![npm](https://img.shields.io/npm/dm/react-native-animatable.svg)](https://npmjs.com/package/react-native-animatable)
 
 ## Installation
 

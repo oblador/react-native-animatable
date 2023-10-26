@@ -57,7 +57,7 @@ describe('createAnimation', () => {
           opacity: 1,
         },
       }),
-    ).toThrow('Animation definitions must have at least two values.')
+    ).toThrow('Animation definitions must have at least two values.');
   });
 
   it('should support and flatten transform values', () => {
@@ -128,9 +128,9 @@ describe('createAnimation', () => {
       to: {
         opacity: 1,
       },
-    }
-    const firstAnimation = createAnimation(definition)
-    const secondAnimation = createAnimation(definition)
-    expect(secondAnimation).toBe(firstAnimation)
+    };
+    const firstAnimation = createAnimation(definition);
+    const secondAnimation = createAnimation(definition);
+    expect(secondAnimation).toBe(firstAnimation);
   });
 });

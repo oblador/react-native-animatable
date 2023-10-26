@@ -1,11 +1,11 @@
 import React from 'react';
-import { Dimensions, ImageBackground } from 'react-native';
+import {Dimensions, ImageBackground} from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import erlich from './assets/erlich.png';
 import moneyFront from './assets/money-front.png';
 import moneyBack from './assets/money-back.png';
 
-const MONEY_DIMENSIONS = { width: 49, height: 26 };
+const MONEY_DIMENSIONS = {width: 49, height: 26};
 const SCREEN_DIMENSIONS = Dimensions.get('window');
 const WIGGLE_ROOM = 50;
 
@@ -75,11 +75,11 @@ const Swinging = ({
   </Animatable.View>
 );
 
-const Falling = ({ duration, delay, style, children }) => (
+const Falling = ({duration, delay, style, children}) => (
   <Animatable.View
     animation={{
-      from: { translateY: -MONEY_DIMENSIONS.height - WIGGLE_ROOM },
-      to: { translateY: SCREEN_DIMENSIONS.height + WIGGLE_ROOM },
+      from: {translateY: -MONEY_DIMENSIONS.height - WIGGLE_ROOM},
+      to: {translateY: SCREEN_DIMENSIONS.height + WIGGLE_ROOM},
     }}
     duration={duration}
     delay={delay}
@@ -91,8 +91,8 @@ const Falling = ({ duration, delay, style, children }) => (
   </Animatable.View>
 );
 
-const ErlichBachman = ({ children }) => (
-  <ImageBackground source={erlich} style={{ flex: 1 }}>
+const ErlichBachman = ({children}) => (
+  <ImageBackground source={erlich} style={{flex: 1}}>
     {children}
   </ImageBackground>
 );
@@ -107,7 +107,7 @@ const range = count => {
   return array;
 };
 
-const MakeItRain = ({ count = 15, duration = 3000 }) => (
+const MakeItRain = ({count = 15, duration = 3000}) => (
   <ErlichBachman>
     {range(count)
       .map(i => randomize(1000))
@@ -131,7 +131,7 @@ const MakeItRain = ({ count = 15, duration = 3000 }) => (
               source={moneyBack}
               delay={flipDelay}
               back
-              style={{ position: 'absolute' }}
+              style={{position: 'absolute'}}
             />
           </Swinging>
         </Falling>

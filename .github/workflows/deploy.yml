@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish:
+    name: Release new version
+    if: github.repository_owner == 'oblador'
+    runs-on: ubuntu-latest
+    environment: Deploy
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Publish
+        uses: JS-DevTools/npm-publish@v3
+        with:
+          token: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          provenance: true

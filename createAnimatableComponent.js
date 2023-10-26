@@ -38,7 +38,7 @@ const ZERO_CLAMPED_STYLE_PROPERTIES = ['width', 'height'];
 // Create a copy of `source` without `keys`
 function omit(keys, source) {
   const filtered = {};
-  Object.keys(source).forEach(key => {
+  Object.keys(source).forEach((key) => {
     if (keys.indexOf(key) === -1) {
       filtered[key] = source[key];
     }
@@ -84,7 +84,7 @@ function getCompiledAnimation(animation) {
 
 function makeInterpolatedStyle(compiledAnimation, animationValue) {
   const style = {};
-  Object.keys(compiledAnimation).forEach(key => {
+  Object.keys(compiledAnimation).forEach((key) => {
     if (key === 'style') {
       Object.assign(style, compiledAnimation.style);
     } else if (key !== 'easing') {
@@ -224,7 +224,7 @@ export default function createAnimatableComponent(WrappedComponent) {
       this.delayTimer = null;
 
       // Alias registered animations for backwards compatibility
-      getAnimationNames().forEach(animationName => {
+      getAnimationNames().forEach((animationName) => {
         if (!(animationName in this)) {
           this[animationName] = this.animate.bind(this, animationName);
         }
@@ -239,7 +239,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         transitionKeys,
         this.props.style,
       );
-      Object.keys(currentTransitionValues).forEach(key => {
+      Object.keys(currentTransitionValues).forEach((key) => {
         const value = currentTransitionValues[key];
         if (
           INTERPOLATION_STYLE_PROPERTIES.indexOf(key) !== -1 ||
@@ -263,13 +263,10 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     getTransitionState(keys) {
       const transitionKeys = typeof keys === 'string' ? [keys] : keys;
-      let {
-        transitionValues,
-        currentTransitionValues,
-        transitionStyle,
-      } = this.state;
+      let { transitionValues, currentTransitionValues, transitionStyle } =
+        this.state;
       const missingKeys = transitionKeys.filter(
-        key => !this.state.transitionValues[key],
+        (key) => !this.state.transitionValues[key],
       );
       if (missingKeys.length) {
         const transitionState = this.initializeTransitionState(missingKeys);
@@ -291,7 +288,7 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     ref = null;
 
-    handleRef = ref => {
+    handleRef = (ref) => {
       this.ref = ref;
     };
 
@@ -302,17 +299,12 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     componentDidMount() {
-      const {
-        animation,
-        duration,
-        delay,
-        onAnimationBegin,
-        iterationDelay,
-      } = this.props;
+      const { animation, duration, delay, onAnimationBegin, iterationDelay } =
+        this.props;
       if (animation) {
         const startAnimation = () => {
           onAnimationBegin();
-          this.startAnimation(duration, 0, iterationDelay, endState =>
+          this.startAnimation(duration, 0, iterationDelay, (endState) =>
             this.props.onAnimationEnd(endState),
           );
           this.delayTimer = null;
@@ -346,7 +338,7 @@ export default function createAnimatableComponent(WrappedComponent) {
             this.setAnimation(animation);
           } else {
             onAnimationBegin();
-            this.animate(animation, duration, iterationDelay).then(endState =>
+            this.animate(animation, duration, iterationDelay).then((endState) =>
               this.props.onAnimationEnd(endState),
             );
           }
@@ -365,7 +357,7 @@ export default function createAnimatableComponent(WrappedComponent) {
     setAnimation(animation, callback) {
       const compiledAnimation = getCompiledAnimation(animation);
       this.setState(
-        state => ({
+        (state) => ({
           animationStyle: makeInterpolatedStyle(
             compiledAnimation,
             state.animationValue,
@@ -377,7 +369,7 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     animate(animation, duration, iterationDelay) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         this.setAnimation(animation, () => {
           this.startAnimation(duration, 0, iterationDelay, resolve);
         });
@@ -398,7 +390,8 @@ export default function createAnimatableComponent(WrappedComponent) {
 
     startAnimation(duration, iteration, iterationDelay, callback) {
       const { animationValue, compiledAnimation } = this.state;
-      const { direction, iterationCount, useNativeDriver, isInteraction } = this.props;
+      const { direction, iterationCount, useNativeDriver, isInteraction } =
+        this.props;
       let easing = this.props.easing || compiledAnimation.easing || 'ease';
       let currentIteration = iteration || 0;
       const fromValue = getAnimationOrigin(currentIteration, direction);
@@ -419,13 +412,16 @@ export default function createAnimatableComponent(WrappedComponent) {
       const config = {
         toValue,
         easing,
-        isInteraction: typeof isInteraction !== "undefined" ? isInteraction : iterationCount <= 1,
+        isInteraction:
+          typeof isInteraction !== 'undefined'
+            ? isInteraction
+            : iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
         delay: iterationDelay || 0,
       };
 
-      Animated.timing(animationValue, config).start(endState => {
+      Animated.timing(animationValue, config).start((endState) => {
         currentIteration += 1;
         if (
           endState.finished &&
@@ -448,13 +444,10 @@ export default function createAnimatableComponent(WrappedComponent) {
       const fromValuesFlat = flattenStyle(fromValues);
       const toValuesFlat = flattenStyle(toValues);
       const transitionKeys = Object.keys(toValuesFlat);
-      const {
-        transitionValues,
-        currentTransitionValues,
-        transitionStyle,
-      } = this.getTransitionState(transitionKeys);
+      const { transitionValues, currentTransitionValues, transitionStyle } =
+        this.getTransitionState(transitionKeys);
 
-      transitionKeys.forEach(property => {
+      transitionKeys.forEach((property) => {
         const fromValue = fromValuesFlat[property];
         const toValue = toValuesFlat[property];
         let transitionValue = transitionValues[property];
@@ -509,7 +502,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         to: {},
       };
 
-      Object.keys(toValuesFlat).forEach(property => {
+      Object.keys(toValuesFlat).forEach((property) => {
         const toValue = toValuesFlat[property];
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
@@ -532,8 +525,8 @@ export default function createAnimatableComponent(WrappedComponent) {
             easing,
             this.props.useNativeDriver,
             delay,
-            prop => this.props.onTransitionBegin(prop),
-            prop => this.props.onTransitionEnd(prop),
+            (prop) => this.props.onTransitionBegin(prop),
+            (prop) => this.props.onTransitionEnd(prop),
           );
         } else {
           let currentTransitionValue = currentTransitionValues[property];
@@ -555,7 +548,7 @@ export default function createAnimatableComponent(WrappedComponent) {
     }
 
     transitionToValues(toValues, duration, easing, delay) {
-      Object.keys(toValues).forEach(property => {
+      Object.keys(toValues).forEach((property) => {
         const transitionValue = this.state.transitionValues[property];
         const toValue = toValues[property];
         transitionToValue(
@@ -566,8 +559,8 @@ export default function createAnimatableComponent(WrappedComponent) {
           easing,
           this.props.useNativeDriver,
           delay,
-          prop => this.props.onTransitionBegin(prop),
-          prop => this.props.onTransitionEnd(prop),
+          (prop) => this.props.onTransitionBegin(prop),
+          (prop) => this.props.onTransitionEnd(prop),
         );
       });
     }

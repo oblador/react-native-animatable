@@ -418,7 +418,7 @@ export default function createAnimatableComponent(WrappedComponent) {
             : iterationCount <= 1,
         duration: duration || this.props.duration || 1000,
         useNativeDriver,
-        delay: iterationDelay || 0,
+        delay: (iterationDelay && currentIteration > 0) ? iterationDelay : 0,
       };
 
       Animated.timing(animationValue, config).start((endState) => {

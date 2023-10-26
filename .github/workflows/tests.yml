@@ -1,0 +1,23 @@
+name: Tests
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile --non-interactive --silent --ignore-scripts
+      - name: Static analysis
+        run: yarn lint
+      - name: Run tests
+        run: yarn jest

@@ -330,7 +330,18 @@ export default function createAnimatableComponent(WrappedComponent) {
       } = props;
 
       if (transition) {
+        const oldProps = this.props;
         const values = getStyleValues(transition, props.style);
+        // Don't transition values that are already correct or currently transitioning to the new value.
+        // Prevents transitions being aborted when props are repeated before transition ends.
+        const oldValues = getStyleValues(oldProps.transition, oldProps.style);
+        Object.keys(values).forEach( styleAttribute => {
+          const oldValue = oldValues[styleAttribute];
+          const newValue = values[styleAttribute];
+          if (oldValue === newValue) {
+            delete values[styleAttribute];
+          }
+        });
         this.transitionTo(values, duration, easing, delay);
       } else if (!deepEquals(animation, this.props.animation)) {
         if (animation) {
@@ -456,7 +467,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         }
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
-          typeof value !== 'number';
+          typeof toValue !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         if (needsInterpolation) {
@@ -506,7 +517,7 @@ export default function createAnimatableComponent(WrappedComponent) {
         const toValue = toValuesFlat[property];
         const needsInterpolation =
           INTERPOLATION_STYLE_PROPERTIES.indexOf(property) !== -1 ||
-          typeof value !== 'number';
+          typeof toValue !== 'number';
         const needsZeroClamping =
           ZERO_CLAMPED_STYLE_PROPERTIES.indexOf(property) !== -1;
         const transitionStyle = this.state.transitionStyle[property];
